@@ -7,13 +7,30 @@ public class ArrayStorage {
     private int head;
 
     void clear() {
+        for (int i = 0; i < head; i++) {
+            storage[i] = null;
+        }
+        head = 0;
     }
 
     void save(Resume r) {
+        if (head == storage.length) {
+            System.out.println("Превышен размер хранилища");
+        } else {
+            storage[head] = r;
+            head++;
+        }
     }
 
     Resume get(String uuid) {
-        return null;
+        Resume resume = null;
+        for (int i = 0; i < head; i++) {
+            if (storage[i] != null && storage[i].toString().equals(uuid)) {
+                resume = storage[i];
+                break;
+            }
+        }
+        return resume;
     }
 
     void delete(String uuid) {
@@ -24,8 +41,8 @@ public class ArrayStorage {
             }
         }
         if (delPosition >= 0) {
-            for (int i = delPosition; i < head; i++) {
-                storage[i] = null;
+            for (int i = delPosition; i < head - 1; i++) {
+                storage[i] = storage[i + 1];
             }
             head--;
         }
@@ -35,7 +52,9 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        return new Resume[0];
+        Resume[] allResumes = new Resume[head];
+        System.arraycopy(storage, 0, allResumes, 0, head);
+        return allResumes;
     }
 
     int size() {
