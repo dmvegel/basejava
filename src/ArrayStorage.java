@@ -14,6 +14,7 @@ public class ArrayStorage {
     }
 
     void save(Resume r) {
+        if (r == null) return;
         if (head == storage.length) {
             System.out.println("Превышен размер хранилища");
         } else {
@@ -23,6 +24,7 @@ public class ArrayStorage {
     }
 
     Resume get(String uuid) {
+        if (uuid == null) return null;
         Resume resume = null;
         for (int i = 0; i < head; i++) {
             if (storage[i] != null && storage[i].toString().equals(uuid)) {
@@ -34,6 +36,7 @@ public class ArrayStorage {
     }
 
     void delete(String uuid) {
+        if (uuid == null) return;
         int delPosition = -1;
         for (int i = 0; i < head; i++) {
             if (storage[i] != null && storage[i].toString().equals(uuid)) {
