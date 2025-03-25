@@ -2,7 +2,9 @@
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
+    private Resume[] storage = new Resume[10000];
+
+    private int head;
 
     void clear() {
     }
@@ -15,6 +17,18 @@ public class ArrayStorage {
     }
 
     void delete(String uuid) {
+        int delPosition = -1;
+        for (int i = 0; i < head; i++) {
+            if (storage[i] != null && storage[i].toString().equals(uuid)) {
+                delPosition = i;
+            }
+        }
+        if (delPosition >= 0) {
+            for (int i = delPosition; i < head; i++) {
+                storage[i] = null;
+            }
+            head--;
+        }
     }
 
     /**
@@ -25,6 +39,6 @@ public class ArrayStorage {
     }
 
     int size() {
-        return 0;
+        return head;
     }
 }
