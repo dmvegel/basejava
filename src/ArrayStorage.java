@@ -4,50 +4,38 @@
 public class ArrayStorage {
     private Resume[] storage = new Resume[10000];
 
-    private int head;
+    private int size;
 
     void clear() {
-        for (int i = 0; i < head; i++) {
+        for (int i = 0; i < size; i++) {
             storage[i] = null;
         }
-        head = 0;
+        size = 0;
     }
 
     void save(Resume r) {
-        if (r == null) return;
-        if (head == storage.length) {
+        if (size == storage.length) {
             System.out.println("Превышен размер хранилища");
         } else {
-            storage[head] = r;
-            head++;
+            storage[size++] = r;
         }
     }
 
     Resume get(String uuid) {
-        if (uuid == null) return null;
-        Resume resume = null;
-        for (int i = 0; i < head; i++) {
+        for (int i = 0; i < size; i++) {
             if (storage[i] != null && storage[i].toString().equals(uuid)) {
-                resume = storage[i];
-                break;
+                return storage[i];
             }
         }
-        return resume;
+        return null;
     }
 
     void delete(String uuid) {
-        if (uuid == null) return;
-        int delPosition = -1;
-        for (int i = 0; i < head; i++) {
+        for (int i = 0; i < size; i++) {
             if (storage[i] != null && storage[i].toString().equals(uuid)) {
-                delPosition = i;
+                storage[i] = storage[--size];
+                storage[size] = null;
             }
-        }
-        if (delPosition >= 0) {
-            for (int i = delPosition; i < head - 1; i++) {
-                storage[i] = storage[i + 1];
-            }
-            head--;
         }
     }
 
@@ -55,12 +43,12 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        Resume[] allResumes = new Resume[head];
-        System.arraycopy(storage, 0, allResumes, 0, head);
+        Resume[] allResumes = new Resume[size];
+        System.arraycopy(storage, 0, allResumes, 0, size);
         return allResumes;
     }
 
     int size() {
-        return head;
+        return size;
     }
 }
