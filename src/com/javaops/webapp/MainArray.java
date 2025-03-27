@@ -1,3 +1,8 @@
+package com.javaops.webapp;
+
+import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.storage.ArrayStorage;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

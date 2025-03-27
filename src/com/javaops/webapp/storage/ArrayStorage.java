@@ -1,3 +1,7 @@
+package com.javaops.webapp.storage;
+
+import com.javaops.webapp.model.Resume;
+
 /**
  * Array based storage for Resumes
  */
@@ -6,14 +10,17 @@ public class ArrayStorage {
 
     private int size;
 
-    void clear() {
+    public void clear() {
         for (int i = 0; i < size; i++) {
             storage[i] = null;
         }
         size = 0;
     }
 
-    void save(Resume r) {
+    public void update() {
+
+    }
+    public void save(Resume r) {
         if (size == storage.length) {
             System.out.println("Превышен размер хранилища");
         } else {
@@ -21,7 +28,7 @@ public class ArrayStorage {
         }
     }
 
-    Resume get(String uuid) {
+    public Resume get(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i] != null && storage[i].toString().equals(uuid)) {
                 return storage[i];
@@ -30,7 +37,7 @@ public class ArrayStorage {
         return null;
     }
 
-    void delete(String uuid) {
+    public void delete(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i] != null && storage[i].toString().equals(uuid)) {
                 storage[i] = storage[--size];
@@ -42,13 +49,13 @@ public class ArrayStorage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    Resume[] getAll() {
+    public Resume[] getAll() {
         Resume[] allResumes = new Resume[size];
         System.arraycopy(storage, 0, allResumes, 0, size);
         return allResumes;
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 }

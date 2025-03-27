@@ -1,3 +1,8 @@
+package com.javaops.webapp;
+
+import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.storage.ArrayStorage;
+
 /**
  * Test for your ArrayStorage implementation
  */
