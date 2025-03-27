@@ -17,8 +17,19 @@ public class ArrayStorage {
         size = 0;
     }
 
-    public void update() {
+    public void update(Resume r) {
+        if (!checkExistence(r.getUuid())) {
+            System.out.println("Обновление невозможно: резюме отсутствует в хранилище");
+        }
+    }
 
+    public boolean checkExistence(String uuid) {
+        for (int i = 0; i < size; i++) {
+            if (storage[i].toString().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
     }
     public void save(Resume r) {
         if (size == storage.length) {
