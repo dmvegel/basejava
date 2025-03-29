@@ -2,6 +2,8 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.Resume;
 
+import java.util.Arrays;
+
 /**
  * Array based storage for Resumes
  */
@@ -15,17 +17,17 @@ public class ArrayStorage {
     private int size;
 
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            storage[i] = null;
-        }
+        Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
     public void update(Resume r) {
-        if (getPosition(r.getUuid()) < 0) {
+        int resumePosition = getPosition(r.getUuid());
+        if (resumePosition < 0) {
             System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", r.getUuid());
             return;
         }
+        storage[resumePosition] = r;
     }
 
     public int getPosition(String uuid) {
@@ -72,9 +74,7 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     public Resume[] getAll() {
-        Resume[] allResumes = new Resume[size];
-        System.arraycopy(storage, 0, allResumes, 0, size);
-        return allResumes;
+        return Arrays.copyOf(storage, size);
     }
 
     public int size() {
