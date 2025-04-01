@@ -8,11 +8,12 @@ import java.util.Arrays;
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    private final Resume[] storage = new Resume[10000];
-
     public static final String RESUME_PRESENT_MESSAGE = "Резюме с uuid = %s уже существует в хранилище";
     public static final String RESUME_ABSENT_MESSAGE = "Резюме с uuid = %s отсутствует в хранилище";
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
+    public static final int STORAGE_LIMIT = 10000;
+
+    private final Resume[] storage = new Resume[STORAGE_LIMIT];
 
     private int size;
 
