@@ -12,9 +12,8 @@ public class SortedArrayStorage extends AbstractArrayStorage {
             return;
         }
 
-        int position = getPosition(r.getUuid());
-        int insertPosition = -position - 1;
-        if (position >= 0) {
+        int insertPosition = -getPosition(r.getUuid()) - 1;
+        if (insertPosition < 0) {
             System.out.printf((RESUME_PRESENT_MESSAGE) + "%n", r.getUuid());
             return;
         }
