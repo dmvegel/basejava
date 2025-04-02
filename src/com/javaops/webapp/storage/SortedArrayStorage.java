@@ -2,7 +2,9 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.Resume;
 
-public class SortedArrayStorage extends AbstractArrayStorage{
+import java.util.Arrays;
+
+public class SortedArrayStorage extends AbstractArrayStorage {
     @Override
     public void clear() {
 
@@ -36,5 +38,12 @@ public class SortedArrayStorage extends AbstractArrayStorage{
     @Override
     public int size() {
         return 0;
+    }
+
+    @Override
+    public int getPosition(String uuid) {
+        Resume searchKey = new Resume();
+        searchKey.setUuid(uuid);
+        return Arrays.binarySearch(storage, 0, size, searchKey);
     }
 }

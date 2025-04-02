@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Initial resume class
  */
-public class Resume {
+public class Resume implements Comparable<Resume> {
     // Unique identifier
     String uuid;
 
@@ -24,7 +24,7 @@ public class Resume {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o ) return true;
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Resume resume = (Resume) o;
         return Objects.equals(uuid, resume.uuid);
@@ -33,5 +33,10 @@ public class Resume {
     @Override
     public int hashCode() {
         return Objects.hashCode(uuid);
+    }
+
+    @Override
+    public int compareTo(Resume o) {
+        return this.uuid.compareTo(o.getUuid());
     }
 }
