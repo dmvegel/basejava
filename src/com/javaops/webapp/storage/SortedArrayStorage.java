@@ -6,14 +6,31 @@ import java.util.Arrays;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
     @Override
+    public void save(Resume r) {
+        if (size == storage.length) {
+            System.out.println(STORAGE_EXCESS_MESSAGE);
+            return;
+        }
+
+        int position = getPosition(r.getUuid());
+        int insertPosition = -position - 1;
+        if (position >= 0) {
+            System.out.printf((RESUME_PRESENT_MESSAGE) + "%n", r.getUuid());
+            return;
+        }
+
+        System.arraycopy(storage, insertPosition, storage, insertPosition + 1, size - insertPosition);
+        storage[insertPosition] = r;
+        size++;
+    }
+
+    @Override
     public void delete(String uuid) {
         int resumePosition = getPosition(uuid);
         if (resumePosition >= 0) {
             storage[size] = null;
+            System.arraycopy(storage, resumePosition + 1, storage, resumePosition, size - resumePosition - 1);
             size--;
-            for (int i = resumePosition; i < size; i++) {
-                storage[i] = storage[i + 1];
-            }
             return;
         }
         System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);

@@ -13,6 +13,13 @@ public class MainTestArrayStorage {
     public static void main(String[] args) {
         AbstractArrayStorage[] storages = new AbstractArrayStorage[]{new ArrayStorage(), new SortedArrayStorage()};
         for (Storage storage : storages) {
+            for (int i = 0; i <= storage.size(); i++) {
+                Resume r = new Resume();
+                r.setUuid("uuid" + i);
+                storage.save(r);
+            }
+            storage.clear();
+
             Resume r1 = new Resume();
             r1.setUuid("uuid1");
             Resume r2 = new Resume();
@@ -24,8 +31,8 @@ public class MainTestArrayStorage {
             Resume r5 = new Resume();
             r5.setUuid("uuid5");
 
-            storage.save(r1);
             storage.save(r2);
+            storage.save(r1);
             storage.save(r3);
             storage.save(r3);
 

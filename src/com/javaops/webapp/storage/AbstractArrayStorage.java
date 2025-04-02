@@ -14,21 +14,6 @@ public abstract class AbstractArrayStorage implements Storage {
 
     protected int size;
 
-    public void save(Resume r) {
-        if (size == storage.length) {
-            System.out.println(STORAGE_EXCESS_MESSAGE);
-            return;
-        }
-
-        int position = getPosition(r.getUuid());
-        if (position >= 0) {
-            System.out.printf((RESUME_PRESENT_MESSAGE) + "%n", r.getUuid());
-            return;
-        }
-        storage[-position - 1] = r;
-        size++;
-    }
-
     public void update(Resume r) {
         int resumePosition = getPosition(r.getUuid());
         if (resumePosition < 0) {
