@@ -6,38 +6,17 @@ import java.util.Arrays;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
     @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public Resume get(String uuid) {
-        return null;
-    }
-
-    @Override
-    public void save(Resume r) {
-
-    }
-
-    @Override
-    public void update(Resume r) {
-
-    }
-
-    @Override
     public void delete(String uuid) {
-
-    }
-
-    @Override
-    public Resume[] getAll() {
-        return new Resume[0];
-    }
-
-    @Override
-    public int size() {
-        return 0;
+        int resumePosition = getPosition(uuid);
+        if (resumePosition >= 0) {
+            storage[size] = null;
+            size--;
+            for (int i = resumePosition; i < size; i++) {
+                storage[i] = storage[i + 1];
+            }
+            return;
+        }
+        System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);
     }
 
     @Override
