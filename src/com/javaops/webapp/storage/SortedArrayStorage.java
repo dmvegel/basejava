@@ -28,9 +28,9 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     public void delete(String uuid) {
         int resumePosition = getPosition(uuid);
         if (resumePosition >= 0) {
-            System.arraycopy(storage, resumePosition + 1, storage, resumePosition, size - 1 - resumePosition);
-            storage[size - 1] = null;
             size--;
+            System.arraycopy(storage, resumePosition + 1, storage, resumePosition, size - resumePosition);
+            storage[size] = null;
             return;
         }
         System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);
