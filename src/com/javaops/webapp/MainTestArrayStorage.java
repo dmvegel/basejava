@@ -48,6 +48,7 @@ public class MainTestArrayStorage {
             printAll(storage);
             storage.delete(r1.getUuid());
             printAll(storage);
+            System.out.println("Size: " + storage.size());
             storage.clear();
             printAll(storage);
 

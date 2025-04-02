@@ -28,8 +28,8 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     public void delete(String uuid) {
         int resumePosition = getPosition(uuid);
         if (resumePosition >= 0) {
-            storage[size] = null;
-            System.arraycopy(storage, resumePosition + 1, storage, resumePosition, size - resumePosition - 1);
+            System.arraycopy(storage, resumePosition + 1, storage, resumePosition, size - 1 - resumePosition);
+            storage[size - 1] = null;
             size--;
             return;
         }
