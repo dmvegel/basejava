@@ -7,38 +7,24 @@ import com.javaops.webapp.model.Resume;
  */
 public class ArrayStorage extends AbstractArrayStorage {
     @Override
-    public void save(Resume r) {
-        if (size == storage.length) {
-            System.out.println(STORAGE_EXCESS_MESSAGE);
-            return;
-        }
-
-        int position = getPosition(r.getUuid());
-        if (position >= 0) {
-            System.out.printf((RESUME_PRESENT_MESSAGE) + "%n", r.getUuid());
-            return;
-        }
-        storage[size++] = r;
-    }
-
-    @Override
-    public void delete(String uuid) {
-        int resumePosition = getPosition(uuid);
-        if (resumePosition >= 0) {
-            storage[resumePosition] = storage[--size];
-            storage[size] = null;
-            return;
-        }
-        System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);
-    }
-
-    @Override
-    public int getPosition(String uuid) {
+    protected int getPosition(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
             }
         }
         return -size - 1;
+    }
+
+    @Override
+    protected void insertResume(Resume r, int insertPosition) {
+        storage[insertPosition] = r;
+        size++;
+    }
+
+    @Override
+    protected void deleteResume(int resumePosition) {
+        storage[resumePosition] = storage[--size];
+        storage[size] = null;
     }
 }
