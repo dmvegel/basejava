@@ -16,13 +16,10 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     protected void insertResume(Resume r, int insertPosition) {
         System.arraycopy(storage, insertPosition, storage, insertPosition + 1, size - insertPosition);
         storage[insertPosition] = r;
-        size++;
     }
 
     @Override
     protected void deleteResume(int resumePosition) {
-        size--;
         System.arraycopy(storage, resumePosition + 1, storage, resumePosition, size - resumePosition);
-        storage[size] = null;
     }
 }

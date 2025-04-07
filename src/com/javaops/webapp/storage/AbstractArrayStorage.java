@@ -14,7 +14,7 @@ public abstract class AbstractArrayStorage implements Storage {
 
     protected int size;
 
-    final public void save(Resume r) {
+    public final void save(Resume r) {
         if (size == storage.length) {
             System.out.println(STORAGE_EXCESS_MESSAGE);
             return;
@@ -27,18 +27,21 @@ public abstract class AbstractArrayStorage implements Storage {
         }
 
         insertResume(r, insertPosition);
+        size++;
     }
 
-    final public void delete(String uuid) {
+    public final void delete(String uuid) {
         int resumePosition = getPosition(uuid);
         if (resumePosition >= 0) {
+            size--;
             deleteResume(resumePosition);
+            storage[size] = null;
             return;
         }
         System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);
     }
 
-    final public void update(Resume r) {
+    public final void update(Resume r) {
         int resumePosition = getPosition(r.getUuid());
         if (resumePosition < 0) {
             System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", r.getUuid());
@@ -60,7 +63,7 @@ public abstract class AbstractArrayStorage implements Storage {
         return size;
     }
 
-    final public Resume get(String uuid) {
+    public final Resume get(String uuid) {
         int position = getPosition(uuid);
         if (position >= 0) {
             return storage[position];
