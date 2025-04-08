@@ -14,22 +14,16 @@ public class MainTestArrayStorage {
         AbstractArrayStorage[] storages = new AbstractArrayStorage[]{new ArrayStorage(), new SortedArrayStorage()};
         for (Storage storage : storages) {
             for (int i = 0; i <= storage.size(); i++) {
-                Resume r = new Resume();
-                r.setUuid("uuid" + i);
+                Resume r = new Resume("uuid" + i);
                 storage.save(r);
             }
             storage.clear();
 
-            Resume r1 = new Resume();
-            r1.setUuid("uuid1");
-            Resume r2 = new Resume();
-            r2.setUuid("uuid2");
-            Resume r3 = new Resume();
-            r3.setUuid("uuid3");
-            Resume r4 = new Resume();
-            r4.setUuid("uuid2");
-            Resume r5 = new Resume();
-            r5.setUuid("uuid5");
+            Resume r1 = new Resume("uuid1");
+            Resume r2 = new Resume("uuid2");
+            Resume r3 = new Resume("uuid3");
+            Resume r4 = new Resume("uuid2");
+            Resume r5 = new Resume("uuid5");
 
             storage.save(r2);
             storage.save(r1);
