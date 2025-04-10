@@ -1,7 +1,7 @@
 package com.javaops.webapp.storage;
 
 import com.javaops.webapp.exception.ExistStorageException;
-import com.javaops.webapp.exception.NonExistStorageException;
+import com.javaops.webapp.exception.NotExistStorageException;
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
@@ -37,13 +37,13 @@ public abstract class AbstractArrayStorage implements Storage {
             storage[size] = null;
             return;
         }
-        throw new NonExistStorageException(uuid);
+        throw new NotExistStorageException(uuid);
     }
 
     public final void update(Resume r) {
         int resumePosition = getPosition(r.getUuid());
         if (resumePosition < 0) {
-            throw new NonExistStorageException(r.getUuid());
+            throw new NotExistStorageException(r.getUuid());
         }
         storage[resumePosition] = r;
     }
@@ -66,7 +66,7 @@ public abstract class AbstractArrayStorage implements Storage {
         if (position >= 0) {
             return storage[position];
         }
-        throw new NonExistStorageException(uuid);
+        throw new NotExistStorageException(uuid);
     }
 
     protected abstract int getPosition(String uuid);
