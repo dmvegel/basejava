@@ -1,12 +1,13 @@
 package com.javaops.webapp.storage;
 
+import com.javaops.webapp.exception.ExistStorageException;
+import com.javaops.webapp.exception.NotExistStorageException;
+import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage implements Storage {
-    public static final String RESUME_PRESENT_MESSAGE = "Резюме с uuid = %s уже существует в хранилище";
-    public static final String RESUME_ABSENT_MESSAGE = "Резюме с uuid = %s отсутствует в хранилище";
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
     public static final int STORAGE_LIMIT = 10000;
 
@@ -16,14 +17,12 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public final void save(Resume r) {
         if (size == storage.length) {
-            System.out.println(STORAGE_EXCESS_MESSAGE);
-            return;
+            throw new StorageException(r.getUuid(), STORAGE_EXCESS_MESSAGE);
         }
 
         int insertPosition = -getPosition(r.getUuid()) - 1;
         if (insertPosition < 0) {
-            System.out.printf((RESUME_PRESENT_MESSAGE) + "%n", r.getUuid());
-            return;
+            throw new ExistStorageException(r.getUuid());
         }
 
         insertResume(r, insertPosition);
@@ -38,14 +37,13 @@ public abstract class AbstractArrayStorage implements Storage {
             storage[size] = null;
             return;
         }
-        System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);
+        throw new NotExistStorageException(uuid);
     }
 
     public final void update(Resume r) {
         int resumePosition = getPosition(r.getUuid());
         if (resumePosition < 0) {
-            System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", r.getUuid());
-            return;
+            throw new NotExistStorageException(r.getUuid());
         }
         storage[resumePosition] = r;
     }
@@ -68,8 +66,7 @@ public abstract class AbstractArrayStorage implements Storage {
         if (position >= 0) {
             return storage[position];
         }
-        System.out.printf((RESUME_ABSENT_MESSAGE) + "%n", uuid);
-        return null;
+        throw new NotExistStorageException(uuid);
     }
 
     protected abstract int getPosition(String uuid);
