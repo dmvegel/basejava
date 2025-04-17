@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public abstract class AbstractArrayStorageTest {
+public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
     public static final String EARLY_OVERFLOW_MESSAGE = "Переполнение произошло раньше времени";
 
     private static final String UUID_1 = "uuid1";

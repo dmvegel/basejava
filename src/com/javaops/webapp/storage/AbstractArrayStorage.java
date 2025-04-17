@@ -7,7 +7,7 @@ import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage implements Storage {
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
     public static final int STORAGE_LIMIT = 10000;
 
