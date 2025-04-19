@@ -27,18 +27,7 @@ public class ListStorage extends AbstractStorage {
     public void save(Resume r) {
         if (getNode(r.getUuid()) != null)
             throw new ExistStorageException(r.getUuid());
-        if (firstNode == null) {
-            firstNode = new Node(r, null, null);
-            size++;
-            return;
-        }
-        if (lastNode == null) {
-            lastNode = new Node(r, firstNode, null);
-            firstNode.next = lastNode;
-            size++;
-            return;
-        }
-        lastNode = lastNode.next = new Node(r, lastNode, null);
+        append(r);
         size++;
     }
 
@@ -56,17 +45,9 @@ public class ListStorage extends AbstractStorage {
     public void delete(String uuid) {
         Node node = getNode(uuid);
         if (node != null) {
-            node.element = null;
-            if (node.previous != null)
-                node.previous.next = node.next;
-            else
-                firstNode = node.next;
-            if (node.next != null)
-                node.next.previous = node.previous;
-            else
-                lastNode = node.previous;
-
+            unlink(node);
             size--;
+            if (size == 1) lastNode = null;
             return;
         }
         throw new NotExistStorageException(uuid);
@@ -91,6 +72,29 @@ public class ListStorage extends AbstractStorage {
             node = node.next;
         }
         return null;
+    }
+
+    private void append(Resume r) {
+        if (firstNode == null) {
+            firstNode = new Node(r, null, null);
+        } else if (lastNode == null) {
+            firstNode.next = lastNode = new Node(r, firstNode, null);
+        } else {
+            lastNode = lastNode.next = new Node(r, lastNode, null);
+        }
+    }
+
+    private void unlink(Node node) {
+        if (node.previous != null)
+            node.previous.next = node.next;
+        else {
+            firstNode = node.next;
+        }
+        if (node.next != null)
+            node.next.previous = node.previous;
+        else {
+            lastNode = node.previous;
+        }
     }
 
     private static class Node {
