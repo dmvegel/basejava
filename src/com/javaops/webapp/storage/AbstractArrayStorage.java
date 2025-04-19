@@ -7,13 +7,11 @@ import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage extends AbstractStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
     public static final int STORAGE_LIMIT = 10000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
-
-    protected int size;
 
     public final void save(Resume r) {
         if (size == storage.length) {
@@ -55,10 +53,6 @@ public abstract class AbstractArrayStorage extends AbstractStorage implements St
 
     public Resume[] getAll() {
         return Arrays.copyOf(storage, size);
-    }
-
-    public int size() {
-        return size;
     }
 
     public final Resume get(String uuid) {
