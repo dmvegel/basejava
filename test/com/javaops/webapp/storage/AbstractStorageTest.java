@@ -83,7 +83,7 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void getNotExist() {
-        Assertions.assertThrows(NotExistStorageException.class, () -> storage.get(UUID_NOT_EXIST));
+        getNotExist(UUID_NOT_EXIST);
     }
 
     @Test
@@ -101,12 +101,28 @@ public abstract class AbstractStorageTest {
         Assertions.assertThrows(ExistStorageException.class, () -> storage.save(RESUME_1));
     }
 
+    @Test
+    public void consistentDelete() {
+        storage.delete(UUID_1);
+        storage.delete(UUID_2);
+        storage.delete(UUID_3);
+
+        assertSize(0);
+        getNotExist(UUID_1);
+        getNotExist(UUID_2);
+        getNotExist(UUID_3);
+    }
+
     public void assertSize(int size) {
         Assertions.assertEquals(storage.size(), size);
     }
 
     public void assertGet(Resume resume) {
         Assertions.assertEquals(resume, storage.get(resume.getUuid()));
+    }
+
+    public void getNotExist(String uuid) {
+        Assertions.assertThrows(NotExistStorageException.class, () -> storage.get(uuid));
     }
 
 }
