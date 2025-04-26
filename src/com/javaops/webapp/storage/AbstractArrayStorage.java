@@ -1,49 +1,38 @@
 package com.javaops.webapp.storage;
 
-import com.javaops.webapp.exception.ExistStorageException;
-import com.javaops.webapp.exception.NotExistStorageException;
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage<T extends Integer> extends AbstractStorage<T> {
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
     public static final int STORAGE_LIMIT = 10000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
 
-    public final void save(Resume r) {
+    @Override
+    protected Resume doGet(T searchKey) {
+        return storage[searchKey.intValue()];
+    }
+
+    @Override
+    protected void doSave(Resume resume, T searchKey) {
         if (size == storage.length) {
-            throw new StorageException(r.getUuid(), STORAGE_EXCESS_MESSAGE);
+            throw new StorageException(resume.getUuid(), STORAGE_EXCESS_MESSAGE);
         }
-
-        int insertPosition = -getPosition(r.getUuid()) - 1;
-        if (insertPosition < 0) {
-            throw new ExistStorageException(r.getUuid());
-        }
-
-        insertResume(r, insertPosition);
-        size++;
+        insertResume(resume, searchKey);
     }
 
-    public final void delete(String uuid) {
-        int resumePosition = getPosition(uuid);
-        if (resumePosition >= 0) {
-            size--;
-            deleteResume(resumePosition);
-            storage[size] = null;
-            return;
-        }
-        throw new NotExistStorageException(uuid);
+    @Override
+    protected void doUpdate(Resume resume, T searchKey) {
+        storage[searchKey.intValue()] = resume;
     }
 
-    public final void update(Resume r) {
-        int resumePosition = getPosition(r.getUuid());
-        if (resumePosition < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        }
-        storage[resumePosition] = r;
+    @Override
+    protected void doDelete(T searchKey) {
+        deleteResume(searchKey);
+        storage[size] = null;
     }
 
     public void clear() {
@@ -51,19 +40,14 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size = 0;
     }
 
+    @Override
+    protected boolean isExist(Integer searchKey) {
+        return searchKey >= 0;
+    }
+
     public Resume[] getAll() {
         return Arrays.copyOf(storage, size);
     }
-
-    public final Resume get(String uuid) {
-        int position = getPosition(uuid);
-        if (position >= 0) {
-            return storage[position];
-        }
-        throw new NotExistStorageException(uuid);
-    }
-
-    protected abstract int getPosition(String uuid);
 
     protected abstract void insertResume(Resume r, int insertPosition);
 

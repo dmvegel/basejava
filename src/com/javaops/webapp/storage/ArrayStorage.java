@@ -4,22 +4,22 @@ import com.javaops.webapp.model.Resume;
 
 public class ArrayStorage extends AbstractArrayStorage {
     @Override
-    protected int getPosition(String uuid) {
+    protected void insertResume(Resume r, int insertPosition) {
+        storage[size] = r;
+    }
+
+    @Override
+    protected void deleteResume(int resumePosition) {
+        storage[resumePosition] = storage[size - 1];
+    }
+
+    @Override
+    protected Integer getSearchKey(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
             }
         }
         return -size - 1;
-    }
-
-    @Override
-    protected void insertResume(Resume r, int insertPosition) {
-        storage[insertPosition] = r;
-    }
-
-    @Override
-    protected void deleteResume(int resumePosition) {
-        storage[resumePosition] = storage[size];
     }
 }

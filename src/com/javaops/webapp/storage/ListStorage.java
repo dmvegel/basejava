@@ -1,10 +1,8 @@
 package com.javaops.webapp.storage;
 
-import com.javaops.webapp.exception.ExistStorageException;
-import com.javaops.webapp.exception.NotExistStorageException;
 import com.javaops.webapp.model.Resume;
 
-public class ListStorage extends AbstractStorage {
+public class ListStorage<T extends ListStorage.Node> extends AbstractStorage<T> {
     private Node firstNode;
     private Node lastNode;
 
@@ -16,41 +14,47 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume get(String uuid) {
-        Node node = getNode(uuid);
-        if (node != null)
-            return node.element;
-        throw new NotExistStorageException(uuid);
+    protected Resume doGet(T searchKey) {
+        return searchKey.element;
     }
 
     @Override
-    public void save(Resume r) {
-        if (getNode(r.getUuid()) != null)
-            throw new ExistStorageException(r.getUuid());
-        append(r);
-        size++;
-    }
-
-    @Override
-    public void update(Resume r) {
-        Node node = getNode(r.getUuid());
-        if (node != null) {
-            node.element = r;
-            return;
+    protected void doSave(Resume resume, T searchKey) {
+        if (firstNode == null) {
+            firstNode = new Node(resume, null, null);
+        } else if (lastNode == null) {
+            firstNode.next = lastNode = new Node(resume, firstNode, null);
+        } else {
+            lastNode = lastNode.next = new Node(resume, lastNode, null);
         }
-        throw new NotExistStorageException(r.getUuid());
     }
 
     @Override
-    public void delete(String uuid) {
-        Node node = getNode(uuid);
-        if (node != null) {
-            unlink(node);
-            size--;
-            if (size == 1) lastNode = null;
-            return;
+    protected void doUpdate(Resume resume, T searchKey) {
+        searchKey.element = resume;
+    }
+
+    @Override
+    protected void doDelete(T searchKey) {
+        unlink(searchKey);
+        if (size - 1 == 1)
+            lastNode = null;
+    }
+
+    @Override
+    protected T getSearchKey(String uuid) {
+        Node node = firstNode;
+        while (node != null) {
+            if (node.element != null && node.element.getUuid().equals(uuid))
+                return (T) node;
+            node = node.next;
         }
-        throw new NotExistStorageException(uuid);
+        return null;
+    }
+
+    @Override
+    protected boolean isExist(T searchKey) {
+        return searchKey != null && searchKey.element != null;
     }
 
     @Override
@@ -62,26 +66,6 @@ public class ListStorage extends AbstractStorage {
             node = node.next;
         }
         return result;
-    }
-
-    private Node getNode(String uuid) {
-        Node node = firstNode;
-        while (node != null) {
-            if (node.element != null && node.element.getUuid().equals(uuid))
-                return node;
-            node = node.next;
-        }
-        return null;
-    }
-
-    private void append(Resume r) {
-        if (firstNode == null) {
-            firstNode = new Node(r, null, null);
-        } else if (lastNode == null) {
-            firstNode.next = lastNode = new Node(r, firstNode, null);
-        } else {
-            lastNode = lastNode.next = new Node(r, lastNode, null);
-        }
     }
 
     private void unlink(Node node) {
@@ -97,7 +81,7 @@ public class ListStorage extends AbstractStorage {
         }
     }
 
-    private static class Node {
+    protected static class Node {
         Resume element;
         Node previous;
         Node next;
