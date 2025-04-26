@@ -9,40 +9,46 @@ public abstract class AbstractStorage<T> implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        T searchKey = getSearchKey(uuid);
-        if (!isExist(searchKey))
-            throw new NotExistStorageException(uuid);
+        T searchKey = getExistingSearchKey(uuid);
         return doGet(searchKey);
     }
 
     @Override
     public void save(Resume r) {
-        T searchKey = getSearchKey(r.getUuid());
-        if (isExist(searchKey))
-            throw new ExistStorageException(r.getUuid());
+        T searchKey = getNotExistingSearchKey(r.getUuid());
         doSave(r, searchKey);
         size++;
     }
 
     @Override
     public void update(Resume r) {
-        T searchKey = getSearchKey(r.getUuid());
-        if (!isExist(searchKey))
-            throw new NotExistStorageException(r.getUuid());
+        T searchKey = getExistingSearchKey(r.getUuid());
         doUpdate(r, searchKey);
     }
 
     @Override
     public void delete(String uuid) {
-        T searchKey = getSearchKey(uuid);
-        if (!isExist(searchKey))
-            throw new NotExistStorageException(uuid);
+        T searchKey = getExistingSearchKey(uuid);
         doDelete(searchKey);
         size--;
     }
 
     public int size() {
         return size;
+    }
+
+    protected T getExistingSearchKey(String uuid) {
+        T searchKey = getSearchKey(uuid);
+        if (isExist(searchKey))
+            return searchKey;
+        throw new NotExistStorageException(uuid);
+    }
+
+    protected T getNotExistingSearchKey(String uuid) {
+        T searchKey = getSearchKey(uuid);
+        if (!isExist(searchKey))
+            return searchKey;
+        throw new ExistStorageException(uuid);
     }
 
     protected abstract Resume doGet(T searchKey);
