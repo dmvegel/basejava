@@ -5,8 +5,7 @@ import com.javaops.webapp.model.Resume;
 public class ArrayStorage extends AbstractArrayStorage {
     @Override
     protected void insertResume(Resume r, int insertPosition) {
-        insertPosition = -insertPosition - 1;
-        storage[insertPosition] = r;
+        storage[-insertPosition - 1] = r;
     }
 
     @Override
