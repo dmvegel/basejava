@@ -5,34 +5,38 @@ import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage<T extends Integer> extends AbstractStorage<T> {
+public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
     public static final int STORAGE_LIMIT = 10000;
+
+    protected int size;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
 
     @Override
-    protected Resume doGet(T searchKey) {
-        return storage[searchKey.intValue()];
+    protected Resume doGet(Integer searchKey) {
+        return storage[searchKey];
     }
 
     @Override
-    protected void doSave(Resume resume, T searchKey) {
+    protected void doSave(Resume resume, Integer searchKey) {
         if (size == storage.length) {
             throw new StorageException(resume.getUuid(), STORAGE_EXCESS_MESSAGE);
         }
         insertResume(resume, searchKey);
+        size++;
     }
 
     @Override
-    protected void doUpdate(Resume resume, T searchKey) {
-        storage[searchKey.intValue()] = resume;
+    protected void doUpdate(Resume resume, Integer searchKey) {
+        storage[searchKey] = resume;
     }
 
     @Override
-    protected void doDelete(T searchKey) {
+    protected void doDelete(Integer searchKey) {
         deleteResume(searchKey);
         storage[size] = null;
+        size--;
     }
 
     public void clear() {
@@ -43,6 +47,10 @@ public abstract class AbstractArrayStorage<T extends Integer> extends AbstractSt
     @Override
     protected boolean isExist(Integer searchKey) {
         return searchKey >= 0;
+    }
+
+    public int size() {
+        return size;
     }
 
     public Resume[] getAll() {

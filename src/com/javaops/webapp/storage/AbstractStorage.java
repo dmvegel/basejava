@@ -5,8 +5,6 @@ import com.javaops.webapp.exception.NotExistStorageException;
 import com.javaops.webapp.model.Resume;
 
 public abstract class AbstractStorage<T> implements Storage {
-    protected int size;
-
     @Override
     public Resume get(String uuid) {
         T searchKey = getExistingSearchKey(uuid);
@@ -17,7 +15,6 @@ public abstract class AbstractStorage<T> implements Storage {
     public void save(Resume r) {
         T searchKey = getNotExistingSearchKey(r.getUuid());
         doSave(r, searchKey);
-        size++;
     }
 
     @Override
@@ -30,11 +27,6 @@ public abstract class AbstractStorage<T> implements Storage {
     public void delete(String uuid) {
         T searchKey = getExistingSearchKey(uuid);
         doDelete(searchKey);
-        size--;
-    }
-
-    public int size() {
-        return size;
     }
 
     protected T getExistingSearchKey(String uuid) {
