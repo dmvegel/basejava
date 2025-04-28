@@ -9,7 +9,7 @@ public class ListStorage extends AbstractStorage<Integer> {
     private final List<Resume> storage;
 
     public ListStorage() {
-        this.storage = new ArrayList<>(10);
+        this.storage = new ArrayList<>();
     }
 
     @Override
