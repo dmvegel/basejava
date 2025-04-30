@@ -3,9 +3,10 @@ package com.javaops.webapp.storage;
 import com.javaops.webapp.model.Resume;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MapStorage extends AbstractStorage<String> {
-    private final HashMap<String, Resume> map;
+    private final Map<String, Resume> map;
 
     public MapStorage() {
         this.map = new HashMap<>();
@@ -28,7 +29,7 @@ public class MapStorage extends AbstractStorage<String> {
 
     @Override
     protected void doUpdate(Resume resume, String searchKey) {
-        map.replace(searchKey, resume);
+        map.put(searchKey, resume);
     }
 
     @Override
