@@ -2,7 +2,6 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.Resume;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class MapUuidStorage extends AbstractStorage<String> {
 
     @Override
     public List<Resume> getAllSorted() {
-        return map.values().stream().sorted(Comparator.comparing(Resume::getFullName)).toList();
+        return map.values().stream().sorted(SORT_COMPARATOR).toList();
     }
 
     @Override
