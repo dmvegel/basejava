@@ -55,8 +55,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return Arrays.stream(Arrays.copyOf(storage, size)).sorted(SORT_COMPARATOR).toList();
+    protected List<Resume> doCopyAll() {
+        return Arrays.stream(Arrays.copyOf(storage, size)).toList();
     }
 
     protected abstract void insertResume(Resume r, int insertPosition);
