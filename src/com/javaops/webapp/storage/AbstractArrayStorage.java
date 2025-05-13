@@ -4,6 +4,7 @@ import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     public static final String STORAGE_EXCESS_MESSAGE = "Превышен размер хранилища";
@@ -53,8 +54,9 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
         return size;
     }
 
-    public Resume[] getAll() {
-        return Arrays.copyOf(storage, size);
+    @Override
+    public List<Resume> getAllSorted() {
+        return Arrays.stream(Arrays.copyOf(storage, size)).sorted(SORT_COMPARATOR).toList();
     }
 
     protected abstract void insertResume(Resume r, int insertPosition);

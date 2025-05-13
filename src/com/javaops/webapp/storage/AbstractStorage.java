@@ -4,7 +4,13 @@ import com.javaops.webapp.exception.ExistStorageException;
 import com.javaops.webapp.exception.NotExistStorageException;
 import com.javaops.webapp.model.Resume;
 
+import java.util.Comparator;
+
 public abstract class AbstractStorage<T> implements Storage {
+    protected static final Comparator<Resume> SORT_COMPARATOR =
+            Comparator.comparing(Resume::getFullName)
+                    .thenComparing(Resume::getUuid);
+
     @Override
     public Resume get(String uuid) {
         T searchKey = getExistingSearchKey(uuid);
