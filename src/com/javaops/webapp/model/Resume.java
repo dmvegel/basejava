@@ -98,6 +98,25 @@ public class Resume implements Comparable<Resume> {
         public void setText(String text) {
             this.text = text;
         }
+
+        @Override
+        public String toString() {
+            return "TextSection{" +
+                    "text='" + text + '\'' +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            TextSection that = (TextSection) o;
+            return Objects.equals(text, that.text);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(text);
+        }
     }
 
     public static class ListSection extends Section {
@@ -114,6 +133,25 @@ public class Resume implements Comparable<Resume> {
         public void setTexts(List<String> texts) {
             this.texts = texts;
         }
+
+        @Override
+        public String toString() {
+            return "ListSection{" +
+                    "texts=" + texts +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            ListSection that = (ListSection) o;
+            return Objects.equals(texts, that.texts);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(texts);
+        }
     }
 
     public static class CompanySection extends Section {
@@ -129,6 +167,25 @@ public class Resume implements Comparable<Resume> {
 
         public void setBlocks(List<CompanyBlock> companyBlocks) {
             this.companyBlocks = companyBlocks;
+        }
+
+        @Override
+        public String toString() {
+            return "CompanySection{" +
+                    "companyBlocks=" + companyBlocks +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            CompanySection that = (CompanySection) o;
+            return Objects.equals(companyBlocks, that.companyBlocks);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(companyBlocks);
         }
     }
 
@@ -165,6 +222,27 @@ public class Resume implements Comparable<Resume> {
 
         public List<Period> getPeriods() {
             return periods;
+        }
+
+        @Override
+        public String toString() {
+            return "CompanyBlock{" +
+                    "title='" + title + '\'' +
+                    ", url='" + url + '\'' +
+                    ", periods=" + periods +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            CompanyBlock that = (CompanyBlock) o;
+            return Objects.equals(title, that.title) && Objects.equals(url, that.url) && Objects.equals(periods, that.periods);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(title, url, periods);
         }
     }
 
@@ -211,6 +289,28 @@ public class Resume implements Comparable<Resume> {
 
         public void setText(String text) {
             this.text = text;
+        }
+
+        @Override
+        public String toString() {
+            return "Period{" +
+                    "start=" + start +
+                    ", end=" + end +
+                    ", title='" + title + '\'' +
+                    ", text='" + text + '\'' +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Period period = (Period) o;
+            return Objects.equals(start, period.start) && Objects.equals(end, period.end) && Objects.equals(title, period.title) && Objects.equals(text, period.text);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(start, end, title, text);
         }
     }
 }
