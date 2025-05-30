@@ -194,8 +194,8 @@ public class Resume implements Comparable<Resume> {
         private String url;
         private List<Period> periods;
 
-        public CompanyBlock(String title, String url) {
-            this.periods = new ArrayList<>();
+        public CompanyBlock(String title, String url, List<Period> periods) {
+            this.periods = periods;
             this.title = title;
             this.url = url;
         }
@@ -253,10 +253,14 @@ public class Resume implements Comparable<Resume> {
         private String text;
 
         public Period(LocalDate start, LocalDate end, String title, String text) {
+            this(start, end, title);
+            this.text = text;
+        }
+
+        public Period(LocalDate start, LocalDate end, String title) {
             this.start = start;
             this.end = end;
             this.title = title;
-            this.text = text;
         }
 
         public LocalDate getStart() {
