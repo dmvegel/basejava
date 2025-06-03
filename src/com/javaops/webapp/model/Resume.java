@@ -1,13 +1,16 @@
 package com.javaops.webapp.model;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 
 public class Resume implements Comparable<Resume> {
+    private String uuid;
 
-    private final String uuid;
+    private String fullName;
 
-    private final String fullName;
+    private Map<ContactType, String> contacts;
+
+    private Map<SectionType, Section> sections;
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
@@ -18,14 +21,40 @@ public class Resume implements Comparable<Resume> {
         Objects.requireNonNull(fullName, "name must not be null");
         this.uuid = uuid;
         this.fullName = fullName;
+        sections = new HashMap<>();
+        contacts = new HashMap<>();
     }
 
     public String getUuid() {
         return uuid;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getFullName() {
         return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(Map<ContactType, String> contacts) {
+        this.contacts = contacts;
+    }
+
+    public Map<SectionType, Section> getSections() {
+        return sections;
+    }
+
+    public void setSections(Map<SectionType, Section> sections) {
+        this.sections = sections;
     }
 
     @Override
