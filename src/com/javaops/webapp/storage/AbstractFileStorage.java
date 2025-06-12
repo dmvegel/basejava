@@ -1,5 +1,6 @@
 package com.javaops.webapp.storage;
 
+import com.javaops.webapp.exception.NoFilesStorageException;
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
@@ -36,11 +37,11 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     protected void doSave(Resume resume, File file) {
         try {
             if (!file.createNewFile()) {
-                throw new StorageException("cannot create file ", file.getName());
+                throw new StorageException(file.getName(), "cannot create file");
             }
             doWrite(resume, file);
         } catch (IOException e) {
-            throw new StorageException("IO error", file.getName(), e);
+            throw new StorageException(file.getName(), "IO error", e);
         }
     }
 
@@ -49,7 +50,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         try {
             doWrite(resume, file);
         } catch (IOException e) {
-            throw new StorageException("IO error", file.getName(), e);
+            throw new StorageException(file.getName(), "IO error", e);
         }
     }
 
@@ -57,7 +58,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     protected void doDelete(File file) {
         Objects.requireNonNull(file, "file must not be null");
         if (!file.delete()) {
-            throw new StorageException("cannot delete file ", file.getName());
+            throw new StorageException(file.getName(), "cannot delete file ");
         }
     }
 
@@ -75,7 +76,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     protected List<Resume> doCopyAll() {
         List<Resume> result = new ArrayList<>();
         File[] files = directory.listFiles();
-        if (files == null) return result;
+        if (files == null) throw new NoFilesStorageException(directory.getName());
         for (File file : files) {
             if (!file.isDirectory()) {
                 result.add(doRead(file));
@@ -87,7 +88,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     public void clear() {
         File[] files = directory.listFiles();
-        if (files == null) return;
+        if (files == null) throw new NoFilesStorageException(directory.getName());
         for (File file : files) {
             doDelete(file);
         }
@@ -96,7 +97,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     public int size() {
         File[] files = directory.listFiles();
-        if (files == null) return 0;
+        if (files == null) throw new NoFilesStorageException(directory.getName());
         return files.length;
     }
 
