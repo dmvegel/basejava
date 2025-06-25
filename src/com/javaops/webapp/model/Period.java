@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Period {
+    public static final LocalDate FOR_NOW = LocalDate.parse("9999-12-31");
+
     private LocalDate start;
     private LocalDate end;
     private String title;

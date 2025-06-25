@@ -85,7 +85,7 @@ public class ResumeTestData {
                 new CompanyBlock("Java Online Projects", "http://javaops.ru/",
                         List.of(new Period(
                                 LocalDate.parse("2013-10-01"),
-                                null,
+                                Period.FOR_NOW,
                                 "Автор проекта.",
                                 "Создание, организация и проведение Java онлайн проектов и стажировок."))),
                 new CompanyBlock("Wrike", "https://www.wrike.com/",

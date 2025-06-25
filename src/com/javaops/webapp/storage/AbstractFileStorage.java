@@ -30,7 +30,11 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         if (!directory.canRead()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
-        return doRead(file);
+        try {
+            return doRead(file);
+        } catch (IOException e) {
+            throw new StorageException("file delete error ", file.getName(), e);
+        }
     }
 
     @Override
@@ -79,7 +83,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         if (files == null) throw new NoFilesStorageException(directory.getName());
         for (File file : files) {
             if (!file.isDirectory()) {
-                result.add(doRead(file));
+                result.add(doGet(file));
             }
         }
         return result;
@@ -101,7 +105,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         return files.length;
     }
 
-    protected abstract Resume doRead(File file);
+    protected abstract Resume doRead(File file) throws IOException;
 
     protected abstract void doWrite(Resume r, File file) throws IOException;
 }
