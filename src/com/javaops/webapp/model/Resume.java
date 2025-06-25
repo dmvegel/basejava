@@ -1,7 +1,9 @@
 package com.javaops.webapp.model;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public class Resume implements Comparable<Resume> {
     private String uuid;
@@ -21,8 +23,8 @@ public class Resume implements Comparable<Resume> {
         Objects.requireNonNull(fullName, "name must not be null");
         this.uuid = uuid;
         this.fullName = fullName;
-        sections = new HashMap<>();
-        contacts = new HashMap<>();
+        sections = new EnumMap<>(SectionType.class);
+        contacts = new EnumMap<>(ContactType.class);
     }
 
     public String getUuid() {

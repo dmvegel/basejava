@@ -9,6 +9,31 @@ import java.util.List;
 public class ResumeTestData {
     public static void main(String[] args) {
         Resume resume = new Resume("Григорий Кислин");
+        fillSections(resume);
+
+        System.out.println(resume.getFullName());
+        System.out.println(resume.getContacts());
+        System.out.println(SectionType.OBJECTIVE);
+        System.out.println(resume.getSections().get(SectionType.OBJECTIVE));
+        System.out.println(SectionType.PERSONAL);
+        System.out.println(resume.getSections().get(SectionType.PERSONAL));
+        System.out.println(SectionType.ACHIEVEMENT);
+        ((ListSection) resume.getSections().get(SectionType.ACHIEVEMENT)).getTexts().forEach(System.out::println);
+        System.out.println(SectionType.QUALIFICATIONS);
+        ((ListSection) resume.getSections().get(SectionType.QUALIFICATIONS)).getTexts().forEach(System.out::println);
+        System.out.println(SectionType.EXPERIENCE);
+        ((CompanySection) resume.getSections().get(SectionType.EXPERIENCE)).getBlocks().forEach(System.out::println);
+        System.out.println(SectionType.EDUCATION);
+        ((CompanySection) resume.getSections().get(SectionType.EDUCATION)).getBlocks().forEach(System.out::println);
+    }
+
+    public static Resume createResume(String uuid, String fullName) {
+        Resume resume = new Resume(uuid, fullName);
+        fillSections(resume);
+        return resume;
+    }
+
+    public static void fillSections(Resume resume) {
         resume.getContacts().put(ContactType.PHONE_NUMBER, "+7(921) 855-0482");
         resume.getContacts().put(ContactType.SKYPE, "skype:grigory.kislin");
         resume.getContacts().put(ContactType.EMAIL, "gkislin@yandex.ru");
@@ -60,7 +85,7 @@ public class ResumeTestData {
                 new CompanyBlock("Java Online Projects", "http://javaops.ru/",
                         List.of(new Period(
                                 LocalDate.parse("2013-10-01"),
-                                null,
+                                Period.FOR_NOW,
                                 "Автор проекта.",
                                 "Создание, организация и проведение Java онлайн проектов и стажировок."))),
                 new CompanyBlock("Wrike", "https://www.wrike.com/",
@@ -163,20 +188,5 @@ public class ResumeTestData {
                                 LocalDate.parse("1987-06-01"),
                                 "Закончил с отличием")))
         )));
-
-        System.out.println(resume.getFullName());
-        System.out.println(resume.getContacts());
-        System.out.println(SectionType.OBJECTIVE);
-        System.out.println(resume.getSections().get(SectionType.OBJECTIVE));
-        System.out.println(SectionType.PERSONAL);
-        System.out.println(resume.getSections().get(SectionType.PERSONAL));
-        System.out.println(SectionType.ACHIEVEMENT);
-        ((ListSection) resume.getSections().get(SectionType.ACHIEVEMENT)).getTexts().forEach(System.out::println);
-        System.out.println(SectionType.QUALIFICATIONS);
-        ((ListSection) resume.getSections().get(SectionType.QUALIFICATIONS)).getTexts().forEach(System.out::println);
-        System.out.println(SectionType.EXPERIENCE);
-        ((CompanySection) resume.getSections().get(SectionType.EXPERIENCE)).getBlocks().forEach(System.out::println);
-        System.out.println(SectionType.EDUCATION);
-        ((CompanySection) resume.getSections().get(SectionType.EDUCATION)).getBlocks().forEach(System.out::println);
     }
 }
