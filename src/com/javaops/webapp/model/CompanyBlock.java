@@ -1,9 +1,12 @@
 package com.javaops.webapp.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class CompanyBlock {
+public class CompanyBlock implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String title;
     private String url;
     private List<Period> periods;
