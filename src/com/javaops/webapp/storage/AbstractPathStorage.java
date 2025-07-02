@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -19,23 +17,19 @@ public abstract class AbstractPathStorage extends AbstractSerializableStorage<Pa
 
     protected AbstractPathStorage(String dir, SerializationStrategy serializationStrategy) {
         super(serializationStrategy);
-        Objects.requireNonNull(dir, "directory must not be null");
+        Objects.requireNonNull(dir, NO_DIRECTORY_ERROR);
         directory = Paths.get(dir);
-        if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {
-            throw new IllegalArgumentException(directory + " is not directory or is not writable");
+        if (!Files.isDirectory(directory) || !Files.isWritable(directory) || !Files.isReadable(directory)) {
+            throw new IllegalArgumentException(directory + NOT_A_DIR_OR_ACCESS_ERROR);
         }
     }
 
     @Override
     protected Resume doGet(Path path) {
-        Objects.requireNonNull(path, "directory must not be null");
-        if (!Files.isReadable(directory)) {
-            throw new IllegalArgumentException(directory + " is not readable");
-        }
         try {
             return serializationStrategy.doRead(new FileInputStream(path.toString()));
         } catch (IOException e) {
-            throw new StorageException("directory delete error ", path.toString(), e);
+            throw new StorageException(path.toString(), FILE_READ_ERROR, e);
         }
     }
 
@@ -43,10 +37,10 @@ public abstract class AbstractPathStorage extends AbstractSerializableStorage<Pa
     protected void doSave(Resume resume, Path path) {
         try {
             Files.createFile(path);
-            serializationStrategy.doWrite(resume, new FileOutputStream(path.toString()));
         } catch (IOException e) {
-            throw new StorageException(path.toString(), "IO error", e);
+            throw new StorageException(path.toString(), FILE_CREATE_ERROR, e);
         }
+        doUpdate(resume, path);
     }
 
     @Override
@@ -54,17 +48,17 @@ public abstract class AbstractPathStorage extends AbstractSerializableStorage<Pa
         try {
             serializationStrategy.doWrite(resume, new FileOutputStream(path.toString()));
         } catch (IOException e) {
-            throw new StorageException(path.toString(), "IO error", e);
+            throw new StorageException(path.toString(), IO_ERROR, e);
         }
     }
 
     @Override
     protected void doDelete(Path path) {
-        Objects.requireNonNull(path, "path must not be null");
+        Objects.requireNonNull(path, FILE_IS_NULL_ERROR);
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new StorageException(path.toString(), "cannot delete path ");
+            throw new StorageException(path.toString(), FILE_DELETE_ERROR);
         }
     }
 
@@ -79,37 +73,11 @@ public abstract class AbstractPathStorage extends AbstractSerializableStorage<Pa
     }
 
     @Override
-    protected List<Resume> doCopyAll() {
-        List<Resume> result = new ArrayList<>();
-        List<Path> paths;
-        try (Stream<Path> pathStream = Files.list(directory)) {
-            paths = pathStream.toList();
+    protected Stream<Path> getStreamResumeFiles() {
+        try {
+            return Files.list(directory);
         } catch (IOException e) {
-            throw new StorageException("Path delete error", null);
-        }
-        for (Path path : paths) {
-            if (!Files.isDirectory(path)) {
-                result.add(doGet(path));
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void clear() {
-        try (Stream<Path> pathStream = Files.list(directory)) {
-            pathStream.forEach(this::doDelete);
-        } catch (IOException e) {
-            throw new StorageException("Path delete error", null);
-        }
-    }
-
-    @Override
-    public int size() {
-        try (Stream<Path> pathStream = Files.list(directory)) {
-            return (int) pathStream.count();
-        } catch (IOException e) {
-            throw new StorageException("Path count error", null);
+            throw new StorageException(null, IO_ERROR);
         }
     }
 }
