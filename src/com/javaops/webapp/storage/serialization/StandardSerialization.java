@@ -1,4 +1,4 @@
-package com.javaops.webapp.storage;
+package com.javaops.webapp.storage.serialization;
 
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;

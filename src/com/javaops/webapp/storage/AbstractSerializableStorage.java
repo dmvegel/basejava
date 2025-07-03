@@ -1,6 +1,7 @@
 package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.storage.serialization.SerializationStrategy;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,10 +16,6 @@ public abstract class AbstractSerializableStorage<T> extends AbstractStorage<T> 
     public static final String NOT_A_DIR_OR_ACCESS_ERROR = " is not directory or is not writable/readable";
 
     protected SerializationStrategy serializationStrategy;
-
-    public void setSerializationStrategy(SerializationStrategy serializationStrategy) {
-        this.serializationStrategy = serializationStrategy;
-    }
 
     public AbstractSerializableStorage(SerializationStrategy serializationStrategy) {
         this.serializationStrategy = serializationStrategy;
