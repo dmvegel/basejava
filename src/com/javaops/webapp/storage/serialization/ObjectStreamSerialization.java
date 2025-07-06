@@ -5,7 +5,7 @@ import com.javaops.webapp.model.Resume;
 
 import java.io.*;
 
-public class StandardSerialization implements SerializationStrategy {
+public class ObjectStreamSerialization implements SerializationStrategy {
     @Override
     public Resume doRead(InputStream is) throws IOException {
         try (ObjectInputStream ois = new ObjectInputStream(is)) {

@@ -9,7 +9,16 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public abstract class AbstractStorage<T> implements Storage {
+    public static final String IO_ERROR = "I/O error";
+    public static final String FILE_IS_NULL_ERROR = "file must not be null";
+    public static final String FILE_CREATE_ERROR = "cannot create file";
+    public static final String FILE_READ_ERROR = "file read error";
+    public static final String NO_DIRECTORY_ERROR = "directory must not be null";
+    public static final String FILE_DELETE_ERROR = "cannot delete file";
+    public static final String NOT_A_DIR_OR_ACCESS_ERROR = " is not directory or is not writable/readable";
+
     private static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());
+
     protected static final Comparator<Resume> SORT_COMPARATOR =
             Comparator.comparing(Resume::getFullName)
                     .thenComparing(Resume::getUuid);

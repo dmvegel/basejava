@@ -8,15 +8,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
-public class ObjectStreamStorage extends AbstractSerializableStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
     private final File directory;
 
-    protected ObjectStreamStorage(File directory, SerializationStrategy serializationStrategy) {
-        super(serializationStrategy);
+    protected SerializationStrategy serializationStrategy;
+
+    protected FileStorage(File directory, SerializationStrategy serializationStrategy) {
+        this.serializationStrategy = serializationStrategy;
         Objects.requireNonNull(directory, NO_DIRECTORY_ERROR);
         if (!directory.canRead() || !directory.canWrite() || !directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + NOT_A_DIR_OR_ACCESS_ERROR);
@@ -73,7 +75,33 @@ public class ObjectStreamStorage extends AbstractSerializableStorage<File> {
     }
 
     @Override
-    protected Stream<File> getStreamResumeFiles() {
-        return Arrays.stream(Objects.requireNonNull(directory.listFiles(), IO_ERROR));
+    protected List<Resume> doCopyAll() {
+        List<Resume> result = new ArrayList<>();
+        for (File file : getFiles()) {
+            if (!file.isDirectory()) {
+                result.add(doGet(file));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void clear() {
+        for (File file : getFiles()) {
+            doDelete(file);
+        }
+    }
+
+    @Override
+    public int size() {
+        return getFiles().length;
+    }
+
+    private File[] getFiles() {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            throw new StorageException(directory.getName(), IO_ERROR);
+        }
+        return files;
     }
 }

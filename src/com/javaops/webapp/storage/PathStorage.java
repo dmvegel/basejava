@@ -10,14 +10,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class ObjectStreamPathStorage extends AbstractSerializableStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
     private final Path directory;
 
-    protected ObjectStreamPathStorage(String dir, SerializationStrategy serializationStrategy) {
-        super(serializationStrategy);
+    protected SerializationStrategy serializationStrategy;
+
+    protected PathStorage(String dir, SerializationStrategy serializationStrategy) {
+        this.serializationStrategy = serializationStrategy;
         Objects.requireNonNull(dir, NO_DIRECTORY_ERROR);
         directory = Paths.get(dir);
         if (!Files.isDirectory(directory) || !Files.isWritable(directory) || !Files.isReadable(directory)) {
@@ -74,7 +77,21 @@ public class ObjectStreamPathStorage extends AbstractSerializableStorage<Path> {
     }
 
     @Override
-    protected Stream<Path> getStreamResumeFiles() {
+    protected List<Resume> doCopyAll() {
+        return getStreamResumeFiles().map(this::doGet).toList();
+    }
+
+    @Override
+    public void clear() {
+        getStreamResumeFiles().forEach(this::doDelete);
+    }
+
+    @Override
+    public int size() {
+        return (int) getStreamResumeFiles().count();
+    }
+
+    private Stream<Path> getStreamResumeFiles() {
         try {
             return Files.list(directory);
         } catch (IOException e) {
