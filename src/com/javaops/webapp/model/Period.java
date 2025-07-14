@@ -1,18 +1,28 @@
 package com.javaops.webapp.model;
 
+import com.javaops.webapp.util.LocalDateXmlAdapter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Period implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static final LocalDate FOR_NOW = LocalDate.parse("9999-12-31");
-
+    @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
     private LocalDate start;
+    @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
     private LocalDate end;
     private String title;
     private String text;
+
+    public Period() {
+    }
 
     public Period(LocalDate start, LocalDate end, String title, String text) {
         this(start, end, title);

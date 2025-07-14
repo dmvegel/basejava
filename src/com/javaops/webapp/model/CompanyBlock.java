@@ -11,6 +11,9 @@ public class CompanyBlock implements Serializable {
     private String url;
     private List<Period> periods;
 
+    public CompanyBlock() {
+    }
+
     public CompanyBlock(String title, String url, List<Period> periods) {
         this.periods = periods;
         this.title = title;

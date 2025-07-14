@@ -6,6 +6,9 @@ import java.util.Objects;
 public class ListSection extends Section {
     private List<String> texts;
 
+    public ListSection() {
+    }
+
     public ListSection(List<String> texts) {
         this.texts = texts;
     }
