@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class DataStreamSerialization implements SerializationStrategy {
+    public static String READ_ERROR = "Section reading error";
+    public static String WRITE_ERROR = "Section writing error";
+    public static String SECTION_TYPE_ERROR = "Wrong section type";
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     @Override
@@ -68,11 +72,11 @@ public class DataStreamSerialization implements SerializationStrategy {
                     return readCompanySection(dis);
                 }
                 default -> {
-                    throw new StorageException(null, "Wrong section type");
+                    throw new StorageException(null, SECTION_TYPE_ERROR);
                 }
             }
         } catch (IOException e) {
-            throw new StorageException(null, "Section reading error");
+            throw new StorageException(null, READ_ERROR);
         }
     }
 
@@ -125,7 +129,7 @@ public class DataStreamSerialization implements SerializationStrategy {
                 }
             }
         } catch (IOException e) {
-            throw new StorageException(null, "Section writing error");
+            throw new StorageException(null, WRITE_ERROR);
         }
     }
 
