@@ -6,6 +6,9 @@ import java.util.Objects;
 public class CompanySection extends Section {
     private List<CompanyBlock> companyBlocks;
 
+    public CompanySection() {
+    }
+
     public CompanySection(List<CompanyBlock> companyBlocks) {
         this.companyBlocks = companyBlocks;
     }
