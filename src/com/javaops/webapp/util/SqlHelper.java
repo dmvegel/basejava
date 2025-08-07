@@ -23,40 +23,23 @@ public class SqlHelper {
         T execute(PreparedStatement ps) throws SQLException;
     }
 
-    private <T> T executeQuery(String sql, Executor<T> executor, String uuid) {
+    public <T> T executeQuery(String sql, Executor<T> executor, String uuid) {
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            return executor.execute(ps);
+
+            T result = executor.execute(ps);
+            if (result == null ||
+                    result instanceof Integer && (Integer) result == 0 && uuid != null) {
+                throw new NotExistStorageException(uuid);
+            }
+            return result;
         } catch (PSQLException e) {
             if (e.getSQLState().equals(PSQLState.UNIQUE_VIOLATION.getState())) {
-                throw new ExistStorageException(uuid);
+                throw new ExistStorageException(e.getMessage());
             }
             throw new StorageException(e.getMessage(), e);
         } catch (SQLException e) {
             throw new StorageException(e.getMessage(), e);
         }
-    }
-
-    public void executeUpdate(String sql, Executor<Integer> executor, String uuid) {
-        int result = executeQuery(sql, executor, uuid);
-        if (result == 0) {
-            throw new NotExistStorageException(uuid);
-        }
-    }
-
-    public <T> void insertUnique(String sql, Executor<T> executor, String uuid) {
-        executeQuery(sql, executor, uuid);
-    }
-
-    public <T> T selectExist(String sql, Executor<T> executor, String uuid) {
-        T result = executeQuery(sql, executor, uuid);
-        if (result == null) {
-            throw new NotExistStorageException(uuid);
-        }
-        return result;
-    }
-
-    public <T> T execute(String sql, Executor<T> executor) {
-        return executeQuery(sql, executor, null);
     }
 }
