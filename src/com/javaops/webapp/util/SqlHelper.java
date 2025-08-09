@@ -26,13 +26,7 @@ public class SqlHelper {
     public <T> T executeQuery(String sql, Executor<T> executor, String uuid) {
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            T result = executor.execute(ps);
-            if (result == null ||
-                    result instanceof Integer && (Integer) result == 0 && uuid != null) {
-                throw new NotExistStorageException(uuid);
-            }
-            return result;
+            return executor.execute(ps);
         } catch (PSQLException e) {
             if (e.getSQLState().equals(PSQLState.UNIQUE_VIOLATION.getState())) {
                 throw new ExistStorageException(e.getMessage());
@@ -41,5 +35,13 @@ public class SqlHelper {
         } catch (SQLException e) {
             throw new StorageException(e.getMessage(), e);
         }
+    }
+
+    public <T> T checkExistAndReturn(T result, String uuid) {
+        if (result == null ||
+                result instanceof Integer && (Integer) result == 0) {
+            throw new NotExistStorageException(uuid);
+        }
+        return result;
     }
 }

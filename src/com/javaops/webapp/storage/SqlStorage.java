@@ -24,13 +24,13 @@ public class SqlStorage implements Storage {
     @Override
     public Resume get(String uuid) {
         return sqlHelper.executeQuery("select * from resume where uuid = ?", ps -> {
-            Resume result = null;
+            Resume resume = null;
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                result = new Resume(uuid, rs.getString("full_name"));
+                resume = new Resume(uuid, rs.getString("full_name"));
             }
-            return result;
+            return sqlHelper.checkExistAndReturn(resume, uuid);
         }, uuid);
     }
 
@@ -39,7 +39,7 @@ public class SqlStorage implements Storage {
         sqlHelper.executeQuery("insert into resume (uuid, full_name) values (?, ?)", ps -> {
             ps.setString(1, r.getUuid());
             ps.setString(2, r.getFullName());
-            return ps.execute();
+            return sqlHelper.checkExistAndReturn(ps.executeUpdate(), r.getUuid());
         }, r.getUuid());
     }
 
@@ -48,7 +48,7 @@ public class SqlStorage implements Storage {
         sqlHelper.executeQuery("update resume set full_name = ? where uuid = ?", ps -> {
             ps.setString(1, r.getFullName());
             ps.setString(2, r.getUuid());
-            return ps.executeUpdate();
+            return sqlHelper.checkExistAndReturn(ps.executeUpdate(), r.getUuid());
         }, r.getUuid());
     }
 
@@ -56,7 +56,7 @@ public class SqlStorage implements Storage {
     public void delete(String uuid) {
         sqlHelper.executeQuery("delete from resume where uuid = ?", ps -> {
             ps.setString(1, uuid);
-            return ps.executeUpdate();
+            return sqlHelper.checkExistAndReturn(ps.executeUpdate(), uuid);
         }, uuid);
     }
 
