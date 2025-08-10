@@ -24,21 +24,16 @@ public class SqlHelper {
     }
 
     @FunctionalInterface
-    public interface SqlTransaction<T> {
-        T execute(Connection conn) throws SQLException;
+    public interface SqlTransaction {
+        void execute(Connection conn) throws SQLException;
     }
 
     public <T> T executeQuery(String sql, Executor<T> executor) {
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             return executor.execute(ps);
-        } catch (PSQLException e) {
-            if (e.getSQLState().equals(PSQLState.UNIQUE_VIOLATION.getState())) {
-                throw new ExistStorageException(e.getMessage());
-            }
-            throw new StorageException(e.getMessage(), e);
         } catch (SQLException e) {
-            throw new StorageException(e.getMessage(), e);
+            throw handleException(e);
         }
     }
 
@@ -50,24 +45,26 @@ public class SqlHelper {
         return result;
     }
 
-    public <T> T transactionalExecute(SqlTransaction<T> executor) {
+    public void transactionalExecute(SqlTransaction executor) {
         try (Connection conn = connectionFactory.getConnection()) {
             try {
                 conn.setAutoCommit(false);
-                T res = executor.execute(conn);
+                executor.execute(conn);
                 conn.commit();
-                return res;
-            } catch (PSQLException e) {
-                if (e.getSQLState().equals(PSQLState.UNIQUE_VIOLATION.getState())) {
-                    throw new ExistStorageException(e.getMessage());
-                }
-                throw new StorageException(e.getMessage(), e);
             } catch (SQLException e) {
                 conn.rollback();
-                throw new StorageException(e.getMessage(), e);
+                throw handleException(e);
             }
         } catch (SQLException e) {
-            throw new StorageException(e.getMessage(), e);
+            throw handleException(e);
         }
+    }
+
+    private RuntimeException handleException(SQLException e) {
+        if (e instanceof PSQLException &&
+                e.getSQLState().equals(PSQLState.UNIQUE_VIOLATION.getState())) {
+            return new ExistStorageException(e.getMessage());
+        }
+        return new StorageException(e.getMessage(), e);
     }
 }
