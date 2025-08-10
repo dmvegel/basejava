@@ -18,7 +18,7 @@ public class SqlStorage implements Storage {
 
     @Override
     public void clear() {
-        sqlHelper.executeQuery("delete from resume", PreparedStatement::executeUpdate, null);
+        sqlHelper.executeQuery("delete from resume", PreparedStatement::executeUpdate);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class SqlStorage implements Storage {
                 resume = new Resume(uuid, rs.getString("full_name"));
             }
             return sqlHelper.checkExistAndReturn(resume, uuid);
-        }, uuid);
+        });
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SqlStorage implements Storage {
             ps.setString(1, r.getUuid());
             ps.setString(2, r.getFullName());
             return ps.executeUpdate();
-        }, r.getUuid());
+        });
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SqlStorage implements Storage {
             ps.setString(1, r.getFullName());
             ps.setString(2, r.getUuid());
             return sqlHelper.checkExistAndReturn(ps.executeUpdate(), r.getUuid());
-        }, r.getUuid());
+        });
     }
 
     @Override
@@ -57,7 +57,7 @@ public class SqlStorage implements Storage {
         sqlHelper.executeQuery("delete from resume where uuid = ?", ps -> {
             ps.setString(1, uuid);
             return sqlHelper.checkExistAndReturn(ps.executeUpdate(), uuid);
-        }, uuid);
+        });
     }
 
     @Override
@@ -69,7 +69,7 @@ public class SqlStorage implements Storage {
                 resumes.add(new Resume(rs.getString("uuid"), rs.getString("full_name")));
             }
             return resumes;
-        }, null);
+        });
     }
 
     @Override
@@ -78,6 +78,6 @@ public class SqlStorage implements Storage {
             ResultSet rs = ps.executeQuery();
             rs.next();
             return rs.getInt(1);
-        }, null);
+        });
     }
 }

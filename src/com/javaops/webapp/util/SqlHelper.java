@@ -23,7 +23,7 @@ public class SqlHelper {
         T execute(PreparedStatement ps) throws SQLException;
     }
 
-    public <T> T executeQuery(String sql, Executor<T> executor, String uuid) {
+    public <T> T executeQuery(String sql, Executor<T> executor) {
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             return executor.execute(ps);
