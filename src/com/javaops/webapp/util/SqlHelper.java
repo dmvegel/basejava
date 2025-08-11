@@ -24,8 +24,8 @@ public class SqlHelper {
     }
 
     @FunctionalInterface
-    public interface SqlTransaction {
-        void execute(Connection conn) throws SQLException;
+    public interface SqlTransaction<T> {
+        T execute(Connection conn) throws SQLException;
     }
 
     public <T> T executeQuery(String sql, Executor<T> executor) {
@@ -45,12 +45,13 @@ public class SqlHelper {
         return result;
     }
 
-    public void transactionalExecute(SqlTransaction executor) {
+    public <T> T transactionalExecute(SqlTransaction<T> executor) {
         try (Connection conn = connectionFactory.getConnection()) {
             try {
                 conn.setAutoCommit(false);
-                executor.execute(conn);
+                T res = executor.execute(conn);
                 conn.commit();
+                return res;
             } catch (SQLException e) {
                 conn.rollback();
                 throw handleException(e);

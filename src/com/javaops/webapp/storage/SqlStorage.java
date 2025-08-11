@@ -21,16 +21,27 @@ public class SqlStorage implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        return sqlHelper.executeQuery(
-                "select * from resume " +
-                        "left join contact " +
-                        "on resume.uuid = contact.resume_uuid " +
-                        "where resume.uuid = ?", ps -> {
-                    ps.setString(1, uuid);
-                    ResultSet rs = ps.executeQuery();
-                    Resume resume = rs.next() ? mapResume(rs) : null;
-                    return sqlHelper.checkExistAndReturn(resume, uuid);
-                });
+        return sqlHelper.transactionalExecute(conn -> {
+                    Resume resume = null;
+                    try (PreparedStatement ps = conn.prepareStatement("select * from resume where uuid = ?")) {
+                        ps.setString(1, uuid);
+                        ResultSet rs = ps.executeQuery();
+                        if (rs.next()) {
+                            resume = resultSetToResume(rs);
+                        }
+                        sqlHelper.checkExistAndReturn(resume, uuid);
+                    }
+                    Map<String, EnumMap<ContactType, String>> allContacts = new HashMap<>();
+                    try (PreparedStatement ps = conn.prepareStatement("select * from contact where resume_uuid = ?")) {
+                        ps.setString(1, uuid);
+                        ResultSet rs = ps.executeQuery();
+                        resultSetToContacts(rs, allContacts);
+                    }
+                    Optional.ofNullable(allContacts.get(resume.getUuid()))
+                            .ifPresent(resume.getContacts()::putAll);
+                    return resume;
+                }
+        );
     }
 
     @Override
@@ -42,6 +53,7 @@ public class SqlStorage implements Storage {
                         ps.executeUpdate();
                     }
                     insertContacts(conn, r);
+                    return null;
                 }
         );
     }
@@ -56,6 +68,7 @@ public class SqlStorage implements Storage {
             }
             deleteContacts(conn, r.getUuid());
             insertContacts(conn, r);
+            return null;
         });
     }
 
@@ -69,18 +82,25 @@ public class SqlStorage implements Storage {
 
     @Override
     public List<Resume> getAllSorted() {
-        return sqlHelper.executeQuery(
-                "select * from resume " +
-                        "left join contact on resume.uuid = contact.resume_uuid " +
-                        "order by full_name, uuid", ps -> {
-                    ResultSet rs = ps.executeQuery();
+        return sqlHelper.transactionalExecute(conn -> {
                     List<Resume> resumes = new ArrayList<>();
-                    if (!rs.next()) {
-                        return resumes;
+                    try (PreparedStatement ps = conn.prepareStatement("select * from resume order by full_name, uuid")) {
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                            resumes.add(resultSetToResume(rs));
+                        }
                     }
-                    do {
-                        resumes.add(mapResume(rs));
-                    } while (!rs.isAfterLast());
+                    Map<String, EnumMap<ContactType, String>> allContacts = new HashMap<>();
+                    try (PreparedStatement ps = conn.prepareStatement("select * from contact")) {
+                        ResultSet rs = ps.executeQuery();
+                        resultSetToContacts(rs, allContacts);
+                    }
+                    for (Resume resume : resumes) {
+                        Map<ContactType, String> contacts = allContacts.get(resume.getUuid());
+                        if (contacts != null) {
+                            resume.getContacts().putAll(contacts);
+                        }
+                    }
                     return resumes;
                 }
         );
@@ -116,24 +136,16 @@ public class SqlStorage implements Storage {
         }
     }
 
-    private Resume mapResume(ResultSet rs) throws SQLException {
-        Resume resume = resultSetToResume(rs);
-        Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-        do {
-            String type = rs.getString("type");
-            if (type != null) {
-                addContact(rs, contacts);
-            }
-        } while (rs.next() && rs.getString("uuid").equals(resume.getUuid()));
-        resume.setContacts(contacts);
-        return resume;
-    }
-
     private Resume resultSetToResume(ResultSet rs) throws SQLException {
         return new Resume(rs.getString("uuid"), rs.getString("full_name"));
     }
 
-    private void addContact(ResultSet rs, Map<ContactType, String> contacts) throws SQLException {
-        contacts.put(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+    private void resultSetToContacts(ResultSet rs, Map<String, EnumMap<ContactType, String>> allContacts) throws SQLException {
+        while (rs.next()) {
+            String uuid = rs.getString("resume_uuid");
+            allContacts
+                    .computeIfAbsent(uuid, k -> new EnumMap<>(ContactType.class))
+                    .put(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+        }
     }
 }
