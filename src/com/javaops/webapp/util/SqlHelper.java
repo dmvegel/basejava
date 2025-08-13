@@ -37,12 +37,11 @@ public class SqlHelper {
         }
     }
 
-    public <T> T checkExistAndReturn(T result, String uuid) {
+    public <T> void checkExist(T result, String uuid) {
         if (result == null ||
                 result instanceof Integer && (Integer) result == 0) {
             throw new NotExistStorageException(uuid);
         }
-        return result;
     }
 
     public <T> T transactionalExecute(SqlTransaction<T> executor) {

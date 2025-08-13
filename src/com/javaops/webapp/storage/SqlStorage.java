@@ -29,16 +29,13 @@ public class SqlStorage implements Storage {
                         if (rs.next()) {
                             resume = resultSetToResume(rs);
                         }
-                        sqlHelper.checkExistAndReturn(resume, uuid);
+                        sqlHelper.checkExist(resume, uuid);
                     }
-                    Map<String, EnumMap<ContactType, String>> allContacts = new HashMap<>();
                     try (PreparedStatement ps = conn.prepareStatement("select * from contact where resume_uuid = ?")) {
                         ps.setString(1, uuid);
                         ResultSet rs = ps.executeQuery();
-                        resultSetToContacts(rs, allContacts);
+                        resultSetToContacts(rs, Map.of(uuid, resume));
                     }
-                    Optional.ofNullable(allContacts.get(resume.getUuid()))
-                            .ifPresent(resume.getContacts()::putAll);
                     return resume;
                 }
         );
@@ -64,7 +61,7 @@ public class SqlStorage implements Storage {
             try (PreparedStatement ps = conn.prepareStatement("update resume set full_name = ? where uuid = ?")) {
                 ps.setString(1, r.getFullName());
                 ps.setString(2, r.getUuid());
-                sqlHelper.checkExistAndReturn(ps.executeUpdate(), r.getUuid());
+                sqlHelper.checkExist(ps.executeUpdate(), r.getUuid());
             }
             deleteContacts(conn, r.getUuid());
             insertContacts(conn, r);
@@ -76,32 +73,26 @@ public class SqlStorage implements Storage {
     public void delete(String uuid) {
         sqlHelper.executeQuery("delete from resume where uuid = ?", ps -> {
             ps.setString(1, uuid);
-            return sqlHelper.checkExistAndReturn(ps.executeUpdate(), uuid);
+            sqlHelper.checkExist(ps.executeUpdate(), uuid);
+            return null;
         });
     }
 
     @Override
     public List<Resume> getAllSorted() {
         return sqlHelper.transactionalExecute(conn -> {
-                    List<Resume> resumes = new ArrayList<>();
+                    Map<String, Resume> resumes = new LinkedHashMap<>();
                     try (PreparedStatement ps = conn.prepareStatement("select * from resume order by full_name, uuid")) {
                         ResultSet rs = ps.executeQuery();
                         while (rs.next()) {
-                            resumes.add(resultSetToResume(rs));
+                            resultSetToResumeMap(rs, resumes);
                         }
                     }
-                    Map<String, EnumMap<ContactType, String>> allContacts = new HashMap<>();
                     try (PreparedStatement ps = conn.prepareStatement("select * from contact")) {
                         ResultSet rs = ps.executeQuery();
-                        resultSetToContacts(rs, allContacts);
+                        resultSetToContacts(rs, resumes);
                     }
-                    for (Resume resume : resumes) {
-                        Map<ContactType, String> contacts = allContacts.get(resume.getUuid());
-                        if (contacts != null) {
-                            resume.getContacts().putAll(contacts);
-                        }
-                    }
-                    return resumes;
+                    return new ArrayList<>(resumes.values());
                 }
         );
     }
@@ -140,12 +131,13 @@ public class SqlStorage implements Storage {
         return new Resume(rs.getString("uuid"), rs.getString("full_name"));
     }
 
-    private void resultSetToContacts(ResultSet rs, Map<String, EnumMap<ContactType, String>> allContacts) throws SQLException {
+    private void resultSetToResumeMap(ResultSet rs, Map<String, Resume> resumes) throws SQLException {
+        resumes.put(rs.getString("uuid"), resultSetToResume(rs));
+    }
+
+    private void resultSetToContacts(ResultSet rs, Map<String, Resume> resumes) throws SQLException {
         while (rs.next()) {
-            String uuid = rs.getString("resume_uuid");
-            allContacts
-                    .computeIfAbsent(uuid, k -> new EnumMap<>(ContactType.class))
-                    .put(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+            resumes.get(rs.getString("resume_uuid")).getContacts().put(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
         }
     }
 }
