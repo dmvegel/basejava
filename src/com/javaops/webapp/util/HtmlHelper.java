@@ -17,28 +17,34 @@ public class HtmlHelper {
     }
 
     private static String createHtmlTable(List<Resume> resumes) {
-        String result =
-                " <table>\n" +
-                        "<tr>\n" +
-                        "  <th>UUID</th>\n" +
-                        "  <th>fullName</th>\n" +
-                        "</tr>\n";
+        StringBuilder result = new StringBuilder();
+        result.append("  <table>\n")
+                .append("    <tr>\n")
+                .append("      <th>UUID</th>\n")
+                .append("      <th>fullName</th>\n")
+                .append("    </tr>\n");
+
         for (Resume r : resumes) {
-            result += "  <tr>\n" +
-                    "      <td>" + r.getUuid() + "</td>\n" +
-                    "      <td>" + r.getFullName() + "</td>\n" +
-                    "    </tr>\n";
+            result.append("   <tr>\n")
+                    .append("   <td>").append(r.getUuid()).append("</td>\n")
+                    .append("   <td>").append(r.getFullName()).append("</td>\n")
+                    .append(" </tr>\n");
         }
-        return result + "</table>";
+
+        result.append("    </table>\n");
+        return result.toString();
     }
 
     public static String buildPage(Storage storage, String uuid) {
-        String result;
         try {
-            result = (uuid == null) ? fillResumesTable(storage::getAllSorted) : HtmlHelper.fillResumesTable(storage::get, uuid);
+            return "<!DOCTYPE html>\n" +
+                    "<html lang=\"en\">\n" +
+                    "<body>\n" +
+                    ((uuid == null) ? fillResumesTable(storage::getAllSorted) : HtmlHelper.fillResumesTable(storage::get, uuid)) +
+                    "</body>\n" +
+                    "</html>";
         } catch (Exception e) {
-            result = e.toString();
+            return e.toString();
         }
-        return result;
     }
 }
