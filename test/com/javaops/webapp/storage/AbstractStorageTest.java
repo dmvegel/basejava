@@ -4,7 +4,7 @@ import com.javaops.webapp.Config;
 import com.javaops.webapp.ResumeTestData;
 import com.javaops.webapp.exception.ExistStorageException;
 import com.javaops.webapp.exception.NotExistStorageException;
-import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,6 +73,12 @@ public abstract class AbstractStorageTest {
     @Test
     public void update() {
         Resume newResume = ResumeTestData.createResume(UUID_1, FULL_NAME_2);
+        newResume.getContacts().put(ContactType.SKYPE, "replacement");
+        newResume.getContacts().remove(ContactType.EMAIL);
+        ((TextSection) newResume.getSections().get(SectionType.PERSONAL)).setText("replacement");
+        newResume.getSections().remove(SectionType.OBJECTIVE);
+        ((ListSection) newResume.getSections().get(SectionType.ACHIEVEMENT)).getTexts().set(0, "replacement");
+        newResume.getSections().remove(SectionType.QUALIFICATIONS);
         storage.update(newResume);
         Assertions.assertEquals(newResume, storage.get(newResume.getUuid()));
     }
