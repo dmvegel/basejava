@@ -1,13 +1,15 @@
 package com.javaops.webapp.web;
 
 import com.javaops.webapp.Config;
+import com.javaops.webapp.model.Resume;
 import com.javaops.webapp.storage.SqlStorage;
-import com.javaops.webapp.util.HtmlHelper;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
     private SqlStorage storage;
@@ -17,12 +19,14 @@ public class ResumeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
         String uuid = request.getParameter("uuid");
-        response.getWriter().write(HtmlHelper.buildPage(storage, uuid));
+        List<Resume> resumes = (uuid == null) ? storage.getAllSorted() : List.of(storage.get(uuid));
+        request.setAttribute("resumes", resumes);
+        getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
     }
 
     @Override
