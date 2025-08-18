@@ -26,7 +26,7 @@ public class ResumeServlet extends HttpServlet {
         String uuid = request.getParameter("uuid");
         List<Resume> resumes = (uuid == null) ? storage.getAllSorted() : List.of(storage.get(uuid));
         request.setAttribute("resumes", resumes);
-        getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
+        getServletContext().getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(request, response);
     }
 
     @Override
