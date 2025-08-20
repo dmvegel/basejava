@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Properties;
 
 public class Config {
-    private static final File PROPS_FILE = new File("config\\resumes.properties");
+    private static final File PROPS_FILE = new File(System.getProperty("props"));
 
     private final File storageDir;
     private final String dbUrl;
