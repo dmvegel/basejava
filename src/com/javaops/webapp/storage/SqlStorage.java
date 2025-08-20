@@ -1,6 +1,7 @@
 package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.*;
+import com.javaops.webapp.util.JsonParser;
 import com.javaops.webapp.util.SqlHelper;
 
 import java.sql.*;
@@ -10,6 +11,11 @@ public class SqlStorage implements Storage {
     private final SqlHelper sqlHelper;
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         this.sqlHelper = new SqlHelper(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
     }
 
@@ -136,7 +142,7 @@ public class SqlStorage implements Storage {
                 SectionType sectionType = e.getKey();
                 ps.setString(1, resume.getUuid());
                 ps.setString(2, sectionType.name());
-                ps.setString(3, sectionType.convert(e.getValue()));
+                ps.setString(3, JsonParser.write(e.getValue(), Section.class));
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -177,8 +183,8 @@ public class SqlStorage implements Storage {
 
     private void resultSetToSections(ResultSet rs, Map<String, Resume> resumes) throws SQLException {
         while (rs.next()) {
-            SectionType sectionType = SectionType.valueOf(rs.getString("type"));
-            resumes.get(rs.getString("resume_uuid")).getSections().put(sectionType, sectionType.convert(rs.getString("value")));
+            resumes.get(rs.getString("resume_uuid")).getSections().put(SectionType.valueOf(rs.getString("type")),
+                    JsonParser.read(rs.getString("value"), Section.class));
         }
     }
 }

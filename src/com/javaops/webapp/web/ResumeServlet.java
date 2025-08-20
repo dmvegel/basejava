@@ -31,11 +31,6 @@ public class ResumeServlet extends HttpServlet {
 
     @Override
     public void init() {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         Config cfg = Config.getInstance();
         storage = new SqlStorage(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
     }
