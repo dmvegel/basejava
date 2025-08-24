@@ -1,9 +1,26 @@
 package com.javaops.webapp.model;
 
+import com.javaops.webapp.util.HtmlHelper;
+
 public enum ContactType {
-    PHONE_NUMBER("Телефон"),
-    SKYPE("Skype"),
-    EMAIL("Почта"),
+    PHONE_NUMBER("Телефон") {
+        @Override
+        public String convertToString(String value) {
+            return getTypeName() + ": " + value;
+        }
+    },
+    SKYPE("Skype") {
+        @Override
+        public String convertToString(String value) {
+            return HtmlHelper.toLink(getTypeName(), "skype:" + value);
+        }
+    },
+    EMAIL("Почта") {
+        @Override
+        public String convertToString(String value) {
+            return HtmlHelper.toLink(getTypeName(), "mailto:" + value);
+        }
+    },
     LINKEDIN("Профиль LinkedIn"),
     GITHUB("Профиль GitHub"),
     STACKOVERFLOW("Профиль Stackoverflow"),
@@ -17,5 +34,9 @@ public enum ContactType {
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public String convertToString(String value) {
+        return HtmlHelper.toLink(getTypeName(), value);
     }
 }
