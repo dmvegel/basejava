@@ -1,9 +1,7 @@
 package com.javaops.webapp.web;
 
 import com.javaops.webapp.Config;
-import com.javaops.webapp.model.ContactType;
-import com.javaops.webapp.model.Resume;
-import com.javaops.webapp.model.SectionType;
+import com.javaops.webapp.model.*;
 import com.javaops.webapp.storage.SqlStorage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -12,8 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ResumeServlet extends HttpServlet {
     private SqlStorage storage;
@@ -34,7 +31,7 @@ public class ResumeServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
             return;
         }
-        Resume r = null;
+        Resume resume;
         switch (action) {
             case Action.DELETE:
                 storage.delete(uuid);
@@ -42,16 +39,16 @@ public class ResumeServlet extends HttpServlet {
                 return;
             case Action.VIEW:
             case Action.EDIT:
-                r = storage.get(uuid);
+                resume = storage.get(uuid);
                 break;
             case Action.CREATE:
-                r = new Resume(UUID.randomUUID().toString(), "");
-                request.getSession().setAttribute("resume", r);
+                resume = new Resume(UUID.randomUUID().toString(), "");
+                request.getSession().setAttribute("resume", resume);
                 break;
+            default:
+                throw new IllegalArgumentException("Action " + action + " is not supported");
         }
-        request.setAttribute("resume", r);
-        request.setAttribute("sectionTypeValues", SectionType.values());
-        request.setAttribute("contactTypeValues", ContactType.values());
+        setRequestAttributes(request, resume);
         request.getRequestDispatcher(
                 (Action.VIEW.equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
         ).forward(request, response);
@@ -66,47 +63,70 @@ public class ResumeServlet extends HttpServlet {
     private void processResume(HttpServletRequest request) {
         boolean isCreation = Objects.equals(request.getParameter("action"), Action.CREATE.name());
         String fullName = request.getParameter("fullName").trim();
-        Resume r;
+        Resume resume;
 
         if (isCreation) {
             HttpSession session = request.getSession();
-            r = (Resume) session.getAttribute("resume");
+            resume = (Resume) session.getAttribute("resume");
             session.removeAttribute("resume");
         } else {
             String uuid = request.getParameter("uuid");
-            r = storage.get(uuid);
+            resume = storage.get(uuid);
         }
 
-        if (fullName.isEmpty()) {
-            if (isCreation) {
-                return;
-            }
-        } else {
-            r.setFullName(fullName);
-        }
+        resume.setFullName(fullName);
 
         for (ContactType type : ContactType.values()) {
             String value = request.getParameter(type.name()).trim();
             if (!value.isEmpty()) {
-                r.getContacts().put(type, value);
+                resume.getContacts().put(type, value);
             } else {
-                r.getContacts().remove(type);
+                resume.getContacts().remove(type);
             }
         }
 
         for (SectionType type : SectionType.values()) {
             String value = request.getParameter(type.name()).trim();
-            if (!value.isBlank() && type != SectionType.EDUCATION && type != SectionType.EXPERIENCE) {
-                r.getSections().put(type, type.convert(value));
+            String[] values = request.getParameterValues(type.name());
+            if (!value.isBlank() || (values != null && values.length > 1)) {
+                switch (type) {
+                    case PERSONAL, OBJECTIVE:
+                        resume.getSections().put(type, new TextSection(value));
+                        break;
+                    case ACHIEVEMENT, QUALIFICATIONS:
+                        resume.getSections().put(type, new ListSection(Arrays.stream(value.split("\n")).filter(s -> !s.isBlank()).toList()));
+                    case EXPERIENCE, EDUCATION:
+
+                        break;
+                    default:
+                        throw new IllegalStateException("Unsupported section type: " + type);
+                }
             } else {
-                r.getSections().remove(type);
+                resume.getSections().remove(type);
             }
         }
 
         if (isCreation) {
-            storage.save(r);
+            storage.save(resume);
         } else {
-            storage.update(r);
+            storage.update(resume);
         }
+    }
+
+    private void setRequestAttributes(HttpServletRequest request, Resume resume) {
+        request.setAttribute("resume", resume);
+        request.setAttribute("sectionTypeValues", SectionType.values());
+        request.setAttribute("contactTypeValues", ContactType.values());
+
+        Map<SectionType, List<CompanyBlock>> companyBlocks = new LinkedHashMap<>();
+
+        for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
+            CompanySection section = (CompanySection) resume.getSections().get(type);
+            if (section != null) {
+                companyBlocks.put(type, section.getBlocks());
+            }
+        }
+
+        request.setAttribute("companyBlocks", companyBlocks);
     }
 }

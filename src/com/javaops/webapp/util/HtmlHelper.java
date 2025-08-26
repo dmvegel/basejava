@@ -1,23 +1,32 @@
 package com.javaops.webapp.util;
 
-import com.javaops.webapp.model.*;
+import com.javaops.webapp.model.ListSection;
+import com.javaops.webapp.model.Period;
+import com.javaops.webapp.model.Section;
+import com.javaops.webapp.model.TextSection;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class HtmlHelper {
-    public static String sectionToHtml(SectionType sectionType, Section section) {
-        return "<h3>" + sectionType.getTitle() + "</h3><br/>" + "<p>" + convertSection(section);
+    public static String toLink(String name, String ref) {
+        return "<a href='" + ref + "'>" + name + "</a>";
     }
 
-    private static String convertSection(Section section) {
+    public static String convertDate(LocalDate date) {
+        return date.equals(Period.FOR_NOW) ? "Сейчас" : date.format(DateTimeFormatter.ofPattern("MM/yyyy"));
+    }
+
+    public static String convertDateToInputFormat(LocalDate date) {
+        return date == null || date.equals(Period.FOR_NOW) ? "" : date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    }
+
+    public static String convertSection(Section section) {
         if (section instanceof TextSection) {
             return ((TextSection) section).getText();
         } else if (section instanceof ListSection) {
-            return "<ul>" + ((ListSection) section).getTexts().stream().reduce("", (a, b) -> a + "<li>" + b + "</li>") + "</ul>";
-        } else {
-            return "";
+            return String.join("\n", ((ListSection) section).getTexts());
         }
-    }
-
-    public static String toLink(String name, String ref) {
-        return "<a href='" + ref + "'>" + name + "</a>";
+        throw new IllegalStateException("Unsupported section: " + section.getClass());
     }
 }
