@@ -3,12 +3,11 @@ package com.javaops.webapp.web;
 import com.javaops.webapp.Config;
 import com.javaops.webapp.model.*;
 import com.javaops.webapp.storage.SqlStorage;
-import com.javaops.webapp.util.ResumeFormBuilder;
+import com.javaops.webapp.util.ResumeUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.*;
@@ -19,7 +18,7 @@ public class ResumeServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
-        processResume(request);
+        ResumeUtils.processResume(request, storage);
         response.sendRedirect("resume");
     }
 
@@ -59,64 +58,6 @@ public class ResumeServlet extends HttpServlet {
     public void init() {
         Config cfg = Config.getInstance();
         storage = new SqlStorage(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
-    }
-
-    private void processResume(HttpServletRequest request) {
-        boolean isCreation = Objects.equals(request.getParameter("action"), Action.CREATE.name());
-        String fullName = request.getParameter("fullName").trim();
-        Resume resume;
-
-        if (isCreation) {
-            HttpSession session = request.getSession();
-            resume = (Resume) session.getAttribute("resume");
-            session.removeAttribute("resume");
-        } else {
-            String uuid = request.getParameter("uuid");
-            resume = storage.get(uuid);
-        }
-
-        resume.setFullName(fullName);
-
-        for (ContactType type : ContactType.values()) {
-            String value = request.getParameter(type.name()).trim();
-            if (!value.isEmpty()) {
-                resume.getContacts().put(type, value);
-            } else {
-                resume.getContacts().remove(type);
-            }
-        }
-
-        for (SectionType type : SectionType.values()) {
-            String[] values = request.getParameterValues(type.name());
-            if (values != null && values.length > 0 && !values[0].isBlank()) {
-                switch (type) {
-                    case PERSONAL, OBJECTIVE:
-                        resume.getSections().put(type, new TextSection(values[0]));
-                        break;
-                    case ACHIEVEMENT, QUALIFICATIONS:
-                        resume.getSections().put(type, new ListSection(Arrays.stream(values[0].split("\n")).filter(s -> !s.isBlank()).toList()));
-                        break;
-                    case EXPERIENCE, EDUCATION:
-                        CompanySection section = ResumeFormBuilder.buildCompanySection(type, values, request);
-                        if (!section.getBlocks().isEmpty()) {
-                            resume.getSections().put(type, section);
-                        } else {
-                            resume.getSections().remove(type);
-                        }
-                        break;
-                    default:
-                        throw new IllegalStateException("Unsupported section type: " + type);
-                }
-            } else {
-                resume.getSections().remove(type);
-            }
-        }
-
-        if (isCreation) {
-            storage.save(resume);
-        } else {
-            storage.update(resume);
-        }
     }
 
     private void setRequestAttributes(HttpServletRequest request, Resume resume, Action action) {
