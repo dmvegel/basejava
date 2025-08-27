@@ -31,24 +31,24 @@
             <c:choose>
                 <c:when test="${sectionType.equals(SectionType.EXPERIENCE) || sectionType.equals(SectionType.EDUCATION)}">
                     <c:forEach var="block" items="${companyBlocks[sectionType]}" varStatus="blockCounter">
-                        <input type="text" name="${sectionType.name()}title${blockCounter.index}" size=100
-                               value="${block.title}" required><br/>
-                        <input type="text" name="${sectionType.name()}url${blockCounter.index}" size=100
+                        <input type="text" name="${sectionType.name()}" size=100
+                               value="${block.title}"><br/>
+                        <input type="text" name="${sectionType.name()}url" size=100
                                value="${block.url}"><br/>
-                        <c:forEach var="period" items="${block.periods}" varStatus="counter">
-                            <label for="start${counter.index}">Дата начала:</label>
-                            <input type="month" id="start${counter.index}"
-                                   name="${sectionType.name()}start${counter.index}"
-                                   value="${HtmlHelper.convertDateToInputFormat(period.start)}" required>
+                        <c:forEach var="period" items="${block.periods}">
+                            <label for="start${blockCounter.index}">Дата начала:</label>
+                            <input type="month" id="start${blockCounter.index}" pattern="^[0-9]{4}-(0[1-9]|1[0-2])$"
+                                   name="${sectionType.name()}start${blockCounter.index}"
+                                   value="${HtmlHelper.convertDateToInputFormat(period.start)}">
 
-                            <label for="end${counter.index}">Дата окончания:</label>
-                            <input type="month" id="end${counter.index}"
-                                   name="${sectionType.name()}end${counter.index}"
+                            <label for="end${blockCounter.index}">Дата окончания:</label>
+                            <input type="month" id="end${blockCounter.index}" pattern="^[0-9]{4}-(0[1-9]|1[0-2])$"
+                                   name="${sectionType.name()}end${blockCounter.index}"
                                    value="${HtmlHelper.convertDateToInputFormat(period.end)}"><br/>
 
-                            <input type="text" name="${sectionType.name()}periodTitle${counter.index}" size=100
-                                   value="${period.title}" required><br/>
-                            <textarea name="${sectionType.name()}periodText${counter.index}"
+                            <input type="text" name="${sectionType.name()}periodTitle${blockCounter.index}" size=100
+                                   value="${period.title}"><br/>
+                            <textarea name="${sectionType.name()}periodText${blockCounter.index}"
                                       class="section-text">${period.text}</textarea><br/>
                         </c:forEach>
                     </c:forEach>

@@ -6,6 +6,7 @@ import com.javaops.webapp.model.Section;
 import com.javaops.webapp.model.TextSection;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
 public class HtmlHelper {
@@ -14,7 +15,7 @@ public class HtmlHelper {
     }
 
     public static String convertDate(LocalDate date) {
-        return date.equals(Period.FOR_NOW) ? "Сейчас" : date.format(DateTimeFormatter.ofPattern("MM/yyyy"));
+        return date == null ? "" : date.equals(Period.FOR_NOW) ? "Сейчас" : date.format(DateTimeFormatter.ofPattern("MM/yyyy"));
     }
 
     public static String convertDateToInputFormat(LocalDate date) {
@@ -28,5 +29,9 @@ public class HtmlHelper {
             return String.join("\n", ((ListSection) section).getTexts());
         }
         throw new IllegalStateException("Unsupported section: " + section.getClass());
+    }
+
+    public static LocalDate parseMonth(String value) {
+        return (value == null || value.isBlank()) ? Period.FOR_NOW : YearMonth.parse(value).atDay(1);
     }
 }

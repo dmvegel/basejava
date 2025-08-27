@@ -3,6 +3,7 @@ package com.javaops.webapp.web;
 import com.javaops.webapp.Config;
 import com.javaops.webapp.model.*;
 import com.javaops.webapp.storage.SqlStorage;
+import com.javaops.webapp.util.ResumeFormBuilder;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,7 +49,7 @@ public class ResumeServlet extends HttpServlet {
             default:
                 throw new IllegalArgumentException("Action " + action + " is not supported");
         }
-        setRequestAttributes(request, resume);
+        setRequestAttributes(request, resume, action);
         request.getRequestDispatcher(
                 (Action.VIEW.equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
         ).forward(request, response);
@@ -86,17 +87,22 @@ public class ResumeServlet extends HttpServlet {
         }
 
         for (SectionType type : SectionType.values()) {
-            String value = request.getParameter(type.name()).trim();
             String[] values = request.getParameterValues(type.name());
-            if (!value.isBlank() || (values != null && values.length > 1)) {
+            if (values != null && values.length > 0 && !values[0].isBlank()) {
                 switch (type) {
                     case PERSONAL, OBJECTIVE:
-                        resume.getSections().put(type, new TextSection(value));
+                        resume.getSections().put(type, new TextSection(values[0]));
                         break;
                     case ACHIEVEMENT, QUALIFICATIONS:
-                        resume.getSections().put(type, new ListSection(Arrays.stream(value.split("\n")).filter(s -> !s.isBlank()).toList()));
+                        resume.getSections().put(type, new ListSection(Arrays.stream(values[0].split("\n")).filter(s -> !s.isBlank()).toList()));
+                        break;
                     case EXPERIENCE, EDUCATION:
-
+                        CompanySection section = ResumeFormBuilder.buildCompanySection(type, values, request);
+                        if (!section.getBlocks().isEmpty()) {
+                            resume.getSections().put(type, section);
+                        } else {
+                            resume.getSections().remove(type);
+                        }
                         break;
                     default:
                         throw new IllegalStateException("Unsupported section type: " + type);
@@ -113,20 +119,33 @@ public class ResumeServlet extends HttpServlet {
         }
     }
 
-    private void setRequestAttributes(HttpServletRequest request, Resume resume) {
+    private void setRequestAttributes(HttpServletRequest request, Resume resume, Action action) {
         request.setAttribute("resume", resume);
         request.setAttribute("sectionTypeValues", SectionType.values());
         request.setAttribute("contactTypeValues", ContactType.values());
+        switch (action) {
+            case CREATE, EDIT -> {
+                Map<SectionType, List<CompanyBlock>> companyBlocks = new LinkedHashMap<>();
 
-        Map<SectionType, List<CompanyBlock>> companyBlocks = new LinkedHashMap<>();
+                for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
+                    CompanySection section = (CompanySection) resume.getSections().get(type);
+                    if (section == null) {
+                        section = new CompanySection();
+                        section.setBlocks(new ArrayList<>());
+                        resume.getSections().put(type, section);
+                    }
+                    CompanyBlock emptyBlock = new CompanyBlock();
+                    emptyBlock.setPeriods(List.of(new Period()));
+                    List<CompanyBlock> allBlocks = section.getBlocks();
+                    for (CompanyBlock block : allBlocks) {
+                        block.getPeriods().add(new Period());
+                    }
+                    section.getBlocks().add(emptyBlock);
 
-        for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
-            CompanySection section = (CompanySection) resume.getSections().get(type);
-            if (section != null) {
-                companyBlocks.put(type, section.getBlocks());
+                    companyBlocks.put(type, section.getBlocks());
+                }
+                request.setAttribute("companyBlocks", companyBlocks);
             }
         }
-
-        request.setAttribute("companyBlocks", companyBlocks);
     }
 }
