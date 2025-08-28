@@ -31,26 +31,32 @@
             <c:choose>
                 <c:when test="${sectionType.equals(SectionType.EXPERIENCE) || sectionType.equals(SectionType.EDUCATION)}">
                     <c:forEach var="block" items="${companyBlocks[sectionType]}" varStatus="blockCounter">
-                        <input type="text" name="${sectionType.name()}" size=100
+                        <input type="text" placeholder="Название" name="${sectionType.name()}" size=100
                                value="${block.title}"><br/>
-                        <input type="text" name="${sectionType.name()}url" size=100
+                        <input type="text" placeholder="Ссылка" name="${sectionType.name()}url" size=100
                                value="${block.url}"><br/>
-                        <c:forEach var="period" items="${block.periods}">
-                            <label for="start${blockCounter.index}">Дата начала:</label>
-                            <input type="month" id="start${blockCounter.index}" pattern="^[0-9]{4}-(0[1-9]|1[0-2])$"
-                                   name="${sectionType.name()}start${blockCounter.index}"
-                                   value="${HtmlHelper.convertDateToInputFormat(period.start)}">
+                        <div class="periods">
+                            <c:forEach var="period" items="${block.periods}">
+                                <label for="start${blockCounter.index}">Дата начала:</label>
+                                <input type="month" placeholder="YYYY-MM" id="start${blockCounter.index}"
+                                       pattern="^[0-9]{4}-(0[1-9]|1[0-2])$"
+                                       name="${sectionType.name()}start${blockCounter.index}"
+                                       value="${HtmlHelper.convertDateToInputFormat(period.start)}">
 
-                            <label for="end${blockCounter.index}">Дата окончания:</label>
-                            <input type="month" id="end${blockCounter.index}" pattern="^[0-9]{4}-(0[1-9]|1[0-2])$"
-                                   name="${sectionType.name()}end${blockCounter.index}"
-                                   value="${HtmlHelper.convertDateToInputFormat(period.end)}"><br/>
+                                <label for="end${blockCounter.index}">Дата окончания:</label>
+                                <input type="month" placeholder="YYYY-MM" id="end${blockCounter.index}"
+                                       pattern="^[0-9]{4}-(0[1-9]|1[0-2])$"
+                                       name="${sectionType.name()}end${blockCounter.index}"
+                                       value="${HtmlHelper.convertDateToInputFormat(period.end)}"><br/>
 
-                            <input type="text" name="${sectionType.name()}periodTitle${blockCounter.index}" size=100
-                                   value="${period.title}"><br/>
-                            <textarea name="${sectionType.name()}periodText${blockCounter.index}"
-                                      class="section-text">${period.text}</textarea><br/>
-                        </c:forEach>
+                                <input type="text" placeholder="Заголовок"
+                                       name="${sectionType.name()}periodTitle${blockCounter.index}" size=100
+                                       value="${period.title}"><br/>
+                                <textarea placeholder="Описание"
+                                          name="${sectionType.name()}periodText${blockCounter.index}"
+                                          class="section-text">${period.text}</textarea><br/>
+                            </c:forEach>
+                        </div>
                     </c:forEach>
                 </c:when>
                 <c:otherwise>

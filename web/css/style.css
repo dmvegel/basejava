@@ -19,3 +19,7 @@ textarea.section-text {
     line-height: 1.8;
     resize: vertical;
 }
+
+.periods {
+    margin-left: 40px;
+}
