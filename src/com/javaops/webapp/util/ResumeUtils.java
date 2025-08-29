@@ -46,7 +46,7 @@ public class ResumeUtils {
                         resume.getSections().put(type, new TextSection(values[0]));
                         break;
                     case ACHIEVEMENT, QUALIFICATIONS:
-                        resume.getSections().put(type, new ListSection(Arrays.stream(values[0].split("\n")).filter(s -> !s.isBlank()).toList()));
+                        resume.getSections().put(type, new ListSection(Arrays.stream(values[0].split("\n")).map(String::trim).filter(s -> !s.isBlank()).toList()));
                         break;
                     case EXPERIENCE, EDUCATION:
                         CompanySection section = ResumeUtils.buildCompanySection(type, values, request);

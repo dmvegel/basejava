@@ -7,7 +7,6 @@ create table resume
 
 create table contact
 (
-    id          integer,
     type        text     not null,
     value       text     not null,
     resume_uuid char(36) not null
@@ -21,7 +20,6 @@ create index contact_uuid_type_index
 
 create table section
 (
-    id          integer,
     type        text     not null,
     value       text     not null,
     resume_uuid char(36) not null

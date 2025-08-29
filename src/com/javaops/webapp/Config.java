@@ -4,7 +4,8 @@ import java.io.*;
 import java.util.Properties;
 
 public class Config {
-    private static final File PROPS_FILE = new File(System.getProperty("props"));
+    private static final String path = System.getProperty("props");
+    private static final File PROPS_FILE = path == null ? null : new File(path);
 
     private final File storageDir;
     private final String dbUrl;
@@ -12,15 +13,27 @@ public class Config {
     private final String dbPassword;
 
     private Config() {
-        try (InputStream is = new FileInputStream(PROPS_FILE)) {
-            Properties properties = new Properties();
-            properties.load(is);
-            storageDir = new File(properties.getProperty("storage.dir"));
-            dbUrl = properties.getProperty("db.url");
-            dbUser = properties.getProperty("db.user");
-            dbPassword = properties.getProperty("db.password");
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid config file " + PROPS_FILE.getAbsolutePath());
+        if (PROPS_FILE == null) {
+            storageDir = null;
+            dbUser = System.getenv("PGUSER");
+            dbPassword = System.getenv("PGPASSWORD");
+
+            String host = System.getenv("PGHOST");
+            String port = System.getenv("PGPORT");
+            String db = System.getenv("PGDATABASE");
+
+            dbUrl = "jdbc:postgresql://" + host + ":" + port + "/" + db;
+        } else {
+            try (InputStream is = new FileInputStream(PROPS_FILE)) {
+                Properties properties = new Properties();
+                properties.load(is);
+                storageDir = new File(properties.getProperty("storage.dir"));
+                dbUrl = properties.getProperty("db.url");
+                dbUser = properties.getProperty("db.user");
+                dbPassword = properties.getProperty("db.password");
+            } catch (IOException e) {
+                throw new IllegalStateException("Invalid config file " + PROPS_FILE.getAbsolutePath());
+            }
         }
     }
 
