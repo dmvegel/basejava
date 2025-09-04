@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Homework12 {
+public class StreamsHW {
     public static void main(String[] args) {
         System.out.println(minValue(new int[]{1, 2, 3, 3, 2, 3})); // 123
         System.out.println(minValue(new int[]{9, 8})); // 89
